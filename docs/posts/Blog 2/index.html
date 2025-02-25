@@ -6,11 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Phil Chodrow">
-<meta name="dcterms.date" content="2023-03-10">
-<meta name="description" content="A new blog post that I just made!">
+<meta name="author" content="Ryan Mauney">
+<meta name="dcterms.date" content="2024-03-05">
+<meta name="description" content="Using a linear score based classifier to maximize bank profits on loans">
 
-<title>Second Post – My Awesome CSCI 0451 Blog</title>
+<title>Blog 2 - Maximizing Loan Profit – My Awesome CSCI 0451 Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -122,35 +122,6 @@ background-size: cover;
       }
 </style>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -197,10 +168,10 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Second Post</h1>
+      <h1 class="title">Blog 2 - Maximizing Loan Profit</h1>
                   <div>
         <div class="description">
-          A new blog post that I just made!
+          Using a linear score based classifier to maximize bank profits on loans
         </div>
       </div>
                 </div>
@@ -212,14 +183,14 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Author</div>
       <div class="quarto-title-meta-contents">
-               <p>Phil Chodrow </p>
+               <p>Ryan Mauney </p>
             </div>
     </div>
       
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">March 10, 2023</p>
+        <p class="date">March 5, 2024</p>
       </div>
     </div>
     
@@ -238,78 +209,18 @@ window.Quarto = {
 
 
 
-<p>This is an example of the blog posts that you’ll submit as your primary form of learning demonstration in CSCI 0451. I created this post by modifying the file <code>posts/example-blog-post/index.ipynb</code> in VSCode. You can also use JupyterLab for this editing if you prefer. Finally, it is possible to write blog posts without using notebooks by writing <code>.qmd</code> files, as illustrated <a href="https://quarto.org/docs/get-started/hello/vscode.html">here</a>.</p>
-<section id="frontmatter" class="level1">
-<h1>Frontmatter</h1>
-<p>Your notebook needs to contain some metadata: things like the title, author, date, etc. You specify this in a <code>raw</code> cell at the very beginning of the notebook. In this notebook, the contents of this cell is:</p>
-<pre><code>---
-title: Hello Blog
-author: Phil Chodrow
-date: '2023-01-10'
-image: "image.jpg"
-description: "An example blog post illustrating the key techniques you'll need to demonstrate your learning in CSCI 0451."
-format: html
----</code></pre>
-<p>Frontmatter can be fiddly (it’s sensitive to spaces, for example), and so the best approach is usually to copy and paste it from previous blog posts, modifying it as appropriate.</p>
+<section id="abstract" class="level1">
+<h1>Abstract</h1>
 </section>
-<section id="running-python-code" class="level1">
-<h1>Running Python Code</h1>
-<p>To run Python code, place your code in a Python code block inside your notebook. You can run the code block inside VSCode (or JupyterLab) using the keyboard shortcut <code>ctrl + Enter</code>. You’ll see the result of your computation below the code, including the value of the most recent statement.</p>
-<div id="cell-2" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">"CSCI"</span> <span class="op">+</span> <span class="st">" 0451"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>'CSCI 0451'</code></pre>
+<section id="data-preparation" class="level1">
+<h1>Data Preparation</h1>
+<div id="cell-3" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/PhilChodrow/ml-notes/main/data/credit-risk/train.csv"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df_train <span class="op">=</span> pd.read_csv(url)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-<p>We’ll have lots of opportunities to make data visualizations in this course. These also display inside the notebook, and get converted into your blog post:</p>
-<div id="cell-4" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>np.pi, <span class="dv">1001</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.sin(x)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.plot(x, y)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>xlab <span class="op">=</span> plt.xlabel(<span class="st">"x"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>ylab <span class="op">=</span> plt.ylabel(<span class="st">"y"</span>)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>title <span class="op">=</span> plt.gca().<span class="bu">set</span>(title <span class="op">=</span> <span class="st">"My Fancy Plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Another thing we’ll often do is implement an algorithm in a source file (i.e.&nbsp;a <code>.py</code> file) and then <em>use</em> it in a notebook. To do this, just place the <code>.py</code> file in the same directory as the notebook. For example, the file <code>source.py</code> in the same directory contains a custom function (which prints a message). I can use like this:</p>
-<div id="cell-6" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> source </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>source.my_custom_function()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<div class="ansi-escaped-output">
-<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[1], line 1</span>
-<span class="ansi-green-fg">----&gt; 1</span> <span style="font-weight:bold;color:rgb(0,135,0)">import</span> <span style="font-weight:bold;color:rgb(0,0,255)">source</span> 
-<span class="ansi-green-fg ansi-bold">      2</span> source<span style="color:rgb(98,98,98)">.</span>my_custom_function()
-
-<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named 'source'</pre>
-</div>
-</div>
-</div>
-</section>
-<section id="markdown" class="level1">
-<h1>Markdown</h1>
-<p>You can use Markdown syntax to write text in Markdown cells. Markdown allows you to create simple text formatting like bullets, italics, and section headers. The Quarto <a href="https://quarto.org/docs/authoring/markdown-basics.html">description of markdown basics</a> has everything you need to get started.</p>
-<section id="math" class="level2">
-<h2 class="anchored" data-anchor-id="math">Math</h2>
-<p>In addition to regular text using the Markdown specification, you can also write mathematics, enclosed between dollar signs. The syntax for writing math is very similar to the syntax used in the <span class="math inline">\(\LaTeX\)</span> markup language. For example, <code>$f(x) \approx y$</code> renders to <span class="math inline">\(f(x) \approx y\)</span>. To place complex mathematical expressions on their own lines, use double dollar signs. For example, the expression</p>
-<p><code>$$\mathcal{L}(a, b) = \sum_{i = 1}^n (ax_i + b - y_i)^2$$</code></p>
-<p>renders to:</p>
-<p><span class="math display">\[\mathcal{L}(a, b) = \sum_{i = 1}^n (ax_i + b - y_i)^2\;.\]</span></p>
-<p>Behind the scenes, math is powered by the MathJax engine. For more on how to write math, check this handy <a href="https://math.meta.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference">tutorial and quick reference</a>.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

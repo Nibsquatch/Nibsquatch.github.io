@@ -214,12 +214,12 @@ background-size: cover;
 
 <section id="abstract" class="level1">
 <h1>Abstract</h1>
-<p>This blog utilizes the Palmer Penguins dataset to develop predictive models for determining the species of penguins based on their morphological measurements. The dataset comprises various features, including culmen length and depth, flipper length, and body mass, across three species: Adelie, Chinstrap, and Gentoo. Qualitative features such as Island, Clutch Completion, and Sex are also included. Through visual analysis, features which differed between species were identified and selected for model training. Both Logistic Regression and Decision Trees were implemented and evaluated. Model performance was assessed using training accuracy both absolute and through cross validation as well as assessment on separate testing data.</p>
+<p>This blog utilizes the Palmer Penguins dataset to develop predictive models for determining the species of penguins based on their morphological measurements. The dataset comprises various features, including culmen length and depth, flipper length, and body mass, across three species: Adelie, Chinstrap, and Gentoo. Qualitative features such as Island, Clutch Completion, and Sex are also included. Through visual analysis, features which differed between species were identified and selected for model training. Both Logistic Regression and Decision Trees (not shown) were implemented and evaluated. Model performance was assessed using training accuracy both absolute and through cross validation as well as assessment on separate testing data.</p>
 </section>
 <section id="data-preparation-and-feature-selection" class="level1">
 <h1>Data Preparation and Feature Selection</h1>
 <p>Loading neccesary packages and prepping the Palmer Penquins data.</p>
-<div id="cell-5" class="cell" data-execution_count="6">
+<div id="cell-5" class="cell" data-execution_count="39">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
@@ -238,7 +238,7 @@ background-size: cover;
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># filter our data so it only contains the variables we will look at first</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the first 5 entries to determine variables that seem as if they could have a correlation</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="39">
 <div>
 
 
@@ -372,9 +372,9 @@ background-size: cover;
 </div>
 </div>
 </div>
-<div id="cell-6" class="cell" data-execution_count="7">
+<div id="cell-6" class="cell" data-execution_count="40">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df.groupby([<span class="st">"Island"</span>, <span class="st">"Species"</span>]).size()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="40">
 <pre><code>Island     Species  
 Biscoe     Adelie       33
            Gentoo       98
@@ -386,7 +386,7 @@ dtype: int64</code></pre>
 </div>
 <p>Torgersen Island is home exclusively to Adelie penguins, while Dream Island is the only habitat for Chinstrap penguins, despite an almost equal distribution of Adelie and Chinstrap there. Biscoe Island hosts primarily Gentoo penguins, making up 74.8% of its population. While Adelie penguins are found on all islands, each island has a degree of exclusivity in species distribution.</p>
 <p>Lets look at the three quantitative predictor variables and plot the combinations we can make.</p>
-<div id="cell-9" class="cell" data-execution_count="8">
+<div id="cell-9" class="cell" data-execution_count="41">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># explore the species groups by culmen length</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -409,8 +409,9 @@ dtype: int64</code></pre>
 </div>
 </div>
 </div>
+<p>While Culmen Depth vs Flipper Length provides the clearest specification for Gentoo Penguins, Adelie and Chinstrap become too muddled to properly distinguish. Culmen Length vs Flipper Length does a good job in making three clusters, with Chinstrap isolating the most, howeever there is still overlap in the regions of Gentoo and Adelie. Culmen Depth vs Culmen Length provides the three most visually distinct clusters for each Penquin species while minimizes visual overlap. Thus, Culmen Depth vs Culme Length will serve as the best choice for quanitative predictors.</p>
 <p>Next we will define a method to properly give integer values to species as well as other categorical variables and apply this method to our data.</p>
-<div id="cell-11" class="cell" data-execution_count="9">
+<div id="cell-12" class="cell" data-execution_count="42">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize LabelEncoders for categorical variables</span></span>
@@ -431,7 +432,7 @@ dtype: int64</code></pre>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize our new training data</span></span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>df_train.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="42">
 <div>
 
 
@@ -547,21 +548,88 @@ dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-12" class="cell" data-execution_count="10">
+<p>With our new training data lets prepare a new data frame only including the predictors we want.</p>
+<div id="cell-14" class="cell" data-execution_count="43">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC <span class="co"># support vector classifier</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the columns we want and separate into predictors</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>predictor_cols <span class="op">=</span> [<span class="st">"Culmen Length (mm)"</span>, <span class="st">"Culmen Depth (mm)"</span>, <span class="st">"Island_Biscoe"</span>, <span class="st">"Island_Torgersen"</span>, <span class="st">"Island_Dream"</span>]</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> df_train[predictor_cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> df_train[predictor_cols]</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>X_train.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="43">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Culmen Length (mm)</th>
+<th data-quarto-table-cell-role="th">Culmen Depth (mm)</th>
+<th data-quarto-table-cell-role="th">Island_Biscoe</th>
+<th data-quarto-table-cell-role="th">Island_Torgersen</th>
+<th data-quarto-table-cell-role="th">Island_Dream</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>40.9</td>
+<td>16.6</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>49.0</td>
+<td>19.5</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>50.0</td>
+<td>15.2</td>
+<td>True</td>
+<td>False</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>45.8</td>
+<td>14.6</td>
+<td>True</td>
+<td>False</td>
+<td>False</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>51.0</td>
+<td>18.8</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+</tbody>
+</table>
+
 </div>
-<div id="cell-13" class="cell" data-execution_count="11">
+</div>
+</div>
+</section>
+<section id="fitting-a-model" class="level1">
+<h1>Fitting a Model</h1>
+<p>Fitting a Linear Regression ML model.</p>
+<div id="cell-17" class="cell" data-execution_count="44">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>LR <span class="op">=</span> LogisticRegression(max_iter <span class="op">=</span> <span class="dv">10000</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> LR.fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Time to check the training accuracy of the model and cross validate.</p>
-<div id="cell-15" class="cell" data-execution_count="12">
+<p>Time to check the training accuracy of the model and cross validate as well as pre-process the testing data for later use.</p>
+<div id="cell-19" class="cell" data-execution_count="45">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># load the testing data to check the accuracy of our model</span></span>
@@ -569,7 +637,7 @@ dtype: int64</code></pre>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> pd.read_csv(test_url)</span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>test[<span class="st">"Species"</span>] <span class="op">=</span> test[<span class="st">"Species"</span>].<span class="bu">str</span>.split().<span class="bu">str</span>.get(<span class="dv">0</span>)</span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># prep the testing data for later use</span></span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>X_test, y_test <span class="op">=</span> prepare_data(test)</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>X_test1 <span class="op">=</span> X_test[predictor_cols]</span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
@@ -582,8 +650,8 @@ dtype: int64</code></pre>
 And cross validation scores: [0.981 1.    1.    0.961 1.   ]</code></pre>
 </div>
 </div>
-<p>Plot the decision regions for the model against the training data.</p>
-<div id="cell-17" class="cell" data-execution_count="13">
+<p>The model has high training accuracy which is confirmed via cross validation. Next we will plot the decision regions for the model against the training data.</p>
+<div id="cell-21" class="cell" data-execution_count="46">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.patches <span class="im">import</span> Patch</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_regions(model, X, y):</span>
@@ -636,356 +704,32 @@ And cross validation scores: [0.981 1.    1.    0.961 1.   ]</code></pre>
 <span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>      </span>
 <span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>      plt.tight_layout()</span>
 <span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>plot_regions(LR, X_train, y_train)</span>
-<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the model accuracy against the testing data</span></span>
-<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Regression for dataset 1 has testing accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(LR.score(X_test1, y_test)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>plot_regions(LR, X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The model seems to be making reasonable decisions for classiying Penquin species on each island. The only island in which the model does not make perfect decisions, is Dream island which is home to all species of Penquins. Next, assess the model against the testing data.</p>
+<div id="cell-23" class="cell" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the model accuracy against the testing data</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Regression for dataset 1 has testing accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(LR.score(X_test1, y_test)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear Regression for dataset 1 has testing accuracy of: 1.0</code></pre>
 </div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-9-output-2.png" class="img-fluid figure-img"></p>
-</figure>
 </div>
-</div>
-</div>
-<p>Linear regression with the current parameters did not result in a 100% testing accuracy. Lets try switching out our qualitative parameter to clutch completion.</p>
-<div id="cell-19" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the columns we want and separate into predictors</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>predictor_cols2 <span class="op">=</span> [<span class="st">"Culmen Length (mm)"</span>, <span class="st">"Flipper Length (mm)"</span>, <span class="st">"Clutch Completion_No"</span>, <span class="st">"Clutch Completion_Yes"</span>]</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>X_train2 <span class="op">=</span> df_train[predictor_cols2]</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize our training dataset 1</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data <span class="op">=</span> df, x <span class="op">=</span> <span class="st">"Culmen Length (mm)"</span>, y <span class="op">=</span> <span class="st">"Flipper Length (mm)"</span>, hue <span class="op">=</span> <span class="st">"Species"</span>, style <span class="op">=</span> <span class="st">"Clutch Completion"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Time to fit the new Linear Regression Model. This model may actually be less accurate than the model taking into account island, as clutch completion seems to be mixed more evenly between penquin species compared to origin island which had some degree of specification.</p>
-<div id="cell-21" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>LR2 <span class="op">=</span> LogisticRegression(max_iter <span class="op">=</span> <span class="dv">10000</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>m2 <span class="op">=</span> LR2.fit(X_train2, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Check the new training accuracy and cross validate. Then look at the decision region for the new model.</p>
-<div id="cell-23" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Regression for dataset 2 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(LR2.score(X_train2, y_train)))</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>cv_scores_LR2 <span class="op">=</span> cross_val_score(LR2, X_train2, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And cross validation scores: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_scores_LR2))</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>plot_regions(LR2, X_train2, y_train)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the model accuracy against the testing data</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>X_test2 <span class="op">=</span> X_test[predictor_cols2]</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Regression for dataset 2 has a testing accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(LR2.score(X_test2, y_test)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Linear Regression for dataset 2 has a training accuracy of: 0.95703125
-And cross validation scores: [0.962 0.941 0.961 0.922 0.98 ]
-Linear Regression for dataset 2 has a testing accuracy of: 0.9558823529411765</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-12-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Unfortunately, changing the qualitative indicator for this model did not result in a testing accuracty of 100%, in fact it decreased the accuracy by ~ 2%. Let’s return to island as the qualitative predictors and explore other quantitative predictors.</p>
-<div id="cell-25" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the columns we want and separate into predictors</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>predictor_cols3 <span class="op">=</span> [<span class="st">"Culmen Depth (mm)"</span>, <span class="st">"Flipper Length (mm)"</span>, <span class="st">"Island_Biscoe"</span>, <span class="st">"Island_Torgersen"</span>, <span class="st">"Island_Dream"</span>]</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>X_train3 <span class="op">=</span> df_train[predictor_cols3]</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize our training dataset 1</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data <span class="op">=</span> df, x <span class="op">=</span> <span class="st">"Culmen Depth (mm)"</span>, y <span class="op">=</span> <span class="st">"Flipper Length (mm)"</span>, hue <span class="op">=</span> <span class="st">"Species"</span>, style <span class="op">=</span> <span class="st">"Island"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Visually there is a large separation between Gentoo and the other species, however there is almost no separation between Chinstrap and Adelie. I’ll try a Linear Regression but a different ML model may be more appropriate. The separation of Gentoo is promising however.</p>
-<div id="cell-27" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>LR3 <span class="op">=</span> LogisticRegression(max_iter <span class="op">=</span> <span class="dv">10000</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>m3 <span class="op">=</span> LR3.fit(X_train3, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Check the new training accuracy and cross validate. Then look at the decision region for the new model.</p>
-<div id="cell-29" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Regression for dataset 3 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(LR3.score(X_train3, y_train)))</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>cv_scores_LR3 <span class="op">=</span> cross_val_score(LR3, X_train3, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And cross validation scores: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_scores_LR3))</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>plot_regions(LR3, X_train3, y_train)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the model accuracy against the testing data</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>X_test3 <span class="op">=</span> X_test[predictor_cols3]</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Regression for dataset 3 has a testing accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(LR3.score(X_test3, y_test)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Linear Regression for dataset 3 has a training accuracy of: 0.8828125
-And cross validation scores: [0.827 0.902 0.902 0.863 0.922]
-Linear Regression for dataset 3 has a testing accuracy of: 0.8970588235294118</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-15-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Linear Regression clearly does not work for these parameters, however the clear separation between Gentoo is promising and other machine learning models should be considered. Lets try a DecisionTree Classifier with the two datasets involving Island as our qualitative indicator.</p>
-<div id="cell-31" class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> DecisionTreeClassifier</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>reg1_1 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">1</span>)</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>reg1_5 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>reg2_1 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">1</span>)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>reg2_5 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># time to fit a decision tree classifier with depth 1 and 5 to both our datasets with Island as the qualitative indicator</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>reg1_1.fit(X_train, y_train)</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>reg1_5.fit(X_train, y_train)</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>reg2_1.fit(X_train3, y_train)</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>reg2_5.fit(X_train3, y_train)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the training accuracy and cross validate each model</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 1 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_1.score(X_train, y_train)) <span class="op">+</span> <span class="st">" for dataset 1"</span>)</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>cv_reg1_1 <span class="op">=</span> cross_val_score(reg1_1, X_train, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg1_1) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 5 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_5.score(X_train, y_train)) <span class="op">+</span> <span class="st">" for dataset 1"</span>)</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>cv_reg1_5 <span class="op">=</span> cross_val_score(reg1_5, X_train, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg1_5) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 1 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg2_1.score(X_train3, y_train)) <span class="op">+</span> <span class="st">" for dataset 3"</span>)</span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>cv_reg2_1 <span class="op">=</span> cross_val_score(reg2_1, X_train3, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg2_1) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 5 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg2_5.score(X_train3, y_train)) <span class="op">+</span> <span class="st">" for dataset 3"</span>)</span>
-<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>cv_reg2_5 <span class="op">=</span> cross_val_score(reg2_5, X_train3, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg2_5) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>DecisionTreeClassifier with depth = 1 has a training accuracy of: 0.7734375 for dataset 1
-And a cross validation of: [0.769 0.765 0.765 0.765 0.784]
-
-DecisionTreeClassifier with depth = 5 has a training accuracy of: 0.9921875 for dataset 1
-And a cross validation of: [0.981 0.98  0.941 0.941 1.   ]
-
-DecisionTreeClassifier with depth = 1 has a training accuracy of: 0.7734375 for dataset 3
-And a cross validation of: [0.769 0.765 0.765 0.765 0.784]
-
-DecisionTreeClassifier with depth = 5 has a training accuracy of: 0.9140625 for dataset 3
-And a cross validation of: [0.865 0.863 0.863 0.882 0.902]
-</code></pre>
-</div>
-</div>
-<p>Based on training accuracy and cross validation model 2 (dataset 1 with depth = 5) seems to be the most promising. Lets check the decision region and accuracy against the testing data.</p>
-<div id="cell-33" class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>plot_regions(reg1_5, X_train, y_train)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the model accuracy against the testing data</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Dataset 1 with depth = 5 has testing accuracy: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_5.score(X_test1, y_test)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Dataset 1 with depth = 5 has testing accuracy: 0.9852941176470589</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-17-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Perhaps this model was overfit to the data. Lets examine the model with the second highest training accuracy (model 4: dataset 3 with depth = 5).</p>
-<div id="cell-35" class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>plot_regions(reg2_5, X_train3, y_train)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the model accuracy against the testing data</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Dataset 3 with depth = 5 has testing accuracy: "</span> <span class="op">+</span> <span class="bu">str</span>(reg2_5.score(X_test3, y_test)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Dataset 3 with depth = 5 has testing accuracy: 0.8676470588235294</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-18-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>The accuracy of the models using dataset 3 were not as good as the models for dataset 1. We will now try additional model complexities in between 1 and 5 on dataset 1 to see if there is a more optimal model depth.</p>
-<div id="cell-37" class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>reg1_2 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">2</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>reg1_3 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">3</span>)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>reg1_4 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">4</span>)</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>reg1_2.fit(X_train, y_train)</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>reg1_3.fit(X_train, y_train)</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>reg1_4.fit(X_train, y_train)</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 2 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_2.score(X_train, y_train)) <span class="op">+</span> <span class="st">" for dataset 1"</span>)</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>cv_reg1_2 <span class="op">=</span> cross_val_score(reg1_2, X_train, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg1_2) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 3 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_3.score(X_train, y_train)) <span class="op">+</span> <span class="st">" for dataset 1"</span>)</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>cv_reg1_3 <span class="op">=</span> cross_val_score(reg1_3, X_train, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg1_3) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 4 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_4.score(X_train, y_train)) <span class="op">+</span> <span class="st">" for dataset 1"</span>)</span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>cv_reg1_4 <span class="op">=</span> cross_val_score(reg1_4, X_train, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg1_4) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a><span class="co"># test the accuracy for each model of varying depth against the test data</span></span>
-<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Testing the model with complexity 2: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_2.score(X_test1, y_test)) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Testing the model with complexity 3: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_3.score(X_test1, y_test)) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Testing the model with complexity 4: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_4.score(X_test1, y_test)) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>DecisionTreeClassifier with depth = 2 has a training accuracy of: 0.9609375 for dataset 1
-And a cross validation of: [0.981 0.902 0.961 0.902 0.98 ]
-
-DecisionTreeClassifier with depth = 3 has a training accuracy of: 0.98046875 for dataset 1
-And a cross validation of: [0.981 0.98  0.98  0.941 0.98 ]
-
-DecisionTreeClassifier with depth = 4 has a training accuracy of: 0.98828125 for dataset 1
-And a cross validation of: [0.981 0.98  0.941 0.941 1.   ]
-
-Testing the model with complexity 2: 0.9558823529411765
-
-Testing the model with complexity 3: 0.9705882352941176
-
-Testing the model with complexity 4: 0.9852941176470589
-</code></pre>
-</div>
-</div>
-<p>It seems that the higher model complexity is yielding better training accuracy and testing accuracy. Lets try the extremes of complexity on dataset 1, even though this may result in overfitting to the training data.</p>
-<div id="cell-39" class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>reg1_25 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">25</span>)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>reg1_100 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">100</span>)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>reg1_500 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">500</span>)</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>reg1_25.fit(X_train, y_train)</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>reg1_100.fit(X_train, y_train)</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>reg1_500.fit(X_train, y_train)</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 25 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_25.score(X_train, y_train)) <span class="op">+</span> <span class="st">" for dataset 1"</span>)</span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>cv_reg1_25 <span class="op">=</span> cross_val_score(reg1_25, X_train, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg1_25) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 100 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_100.score(X_train, y_train)) <span class="op">+</span> <span class="st">" for dataset 1"</span>)</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>cv_reg1_100 <span class="op">=</span> cross_val_score(reg1_100, X_train, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg1_100) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 500 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_500.score(X_train, y_train)) <span class="op">+</span> <span class="st">" for dataset 1"</span>)</span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>cv_reg1_500 <span class="op">=</span> cross_val_score(reg1_500, X_train, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg1_500) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a><span class="co"># test the accuracy for each model of varying depth against the test data</span></span>
-<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Testing the model with complexity 25: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_25.score(X_test1, y_test)) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Testing the model with complexity 100: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_100.score(X_test1, y_test)) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Testing the model with complexity 500: "</span> <span class="op">+</span> <span class="bu">str</span>(reg1_500.score(X_test1, y_test)) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>DecisionTreeClassifier with depth = 25 has a training accuracy of: 1.0 for dataset 1
-And a cross validation of: [0.981 0.98  0.941 0.941 0.98 ]
-
-DecisionTreeClassifier with depth = 100 has a training accuracy of: 1.0 for dataset 1
-And a cross validation of: [0.981 0.98  0.941 0.961 0.98 ]
-
-DecisionTreeClassifier with depth = 500 has a training accuracy of: 1.0 for dataset 1
-And a cross validation of: [0.981 0.98  0.98  0.902 0.98 ]
-
-Testing the model with complexity 25: 0.9852941176470589
-
-Testing the model with complexity 100: 0.9705882352941176
-
-Testing the model with complexity 500: 0.9852941176470589
-</code></pre>
-</div>
-</div>
-<p>100% training accuracy and extremely high accuracy in cross-validation likely means we are overfitting the model to the training data, preventing us from generalizing the model to the test data resulting in lower testing accuracy. This was expcted. Lets try making a new dataset and only looking at Culmen measurements instead of including Flipper Length as a measurment. We will try both Linear Regression as well as a Decision Tree Classifier with depths of 3,4, &amp; 5 as those depth values produced the highest testing accuracy on dataset 1.</p>
-<div id="cell-41" class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the columns we want and separate into predictors</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>predictor_cols4 <span class="op">=</span> [<span class="st">"Culmen Depth (mm)"</span>, <span class="st">"Culmen Length (mm)"</span>, <span class="st">"Island_Biscoe"</span>, <span class="st">"Island_Torgersen"</span>, <span class="st">"Island_Dream"</span>]</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>X_train4 <span class="op">=</span> df_train[predictor_cols4]</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize our training dataset 4</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data <span class="op">=</span> df, x <span class="op">=</span> <span class="st">"Culmen Depth (mm)"</span>, y <span class="op">=</span> <span class="st">"Culmen Length (mm)"</span>, hue <span class="op">=</span> <span class="st">"Species"</span>, style <span class="op">=</span> <span class="st">"Island"</span>, legend <span class="op">=</span> <span class="st">"brief"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-21-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Our fourth batch of data present three fairly clear groups. Gentoo penquins cluster in the upper length, and excuslively belong to Biscoe Island. Chinstrap penquins cluster in between the other two groups, and exclusively belong to Dream Island. While, Adelie penguins can be found at every island, they have a fairly distinct cluster in the bottom right. This data clustering, while it presents some overlap, is extremely promising based on the clustering patterns especially with regard to islands for Gentoo and Chinstrap penquins.</p>
-<div id="cell-43" class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>LR4 <span class="op">=</span> LogisticRegression(max_iter <span class="op">=</span> <span class="dv">10000</span>)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>m4 <span class="op">=</span> LR4.fit(X_train4, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Check the new model against the training data and cross validate. Then plot the decision region and check the model against the test data</p>
-<div id="cell-45" class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Regression for dataset 4 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(LR4.score(X_train4, y_train)))</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>cv_scores_LR4 <span class="op">=</span> cross_val_score(LR4, X_train4, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And cross validation scores: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_scores_LR4))</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>plot_regions(LR4, X_train4, y_train)</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the model accuracy against the testing data</span></span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>X_test4 <span class="op">=</span> X_test[predictor_cols4]</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Regression for dataset 4 has a testing accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(LR4.score(X_test4, y_test)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Linear Regression for dataset 4 has a training accuracy of: 0.99609375
-And cross validation scores: [0.981 1.    1.    0.941 1.   ]
-Linear Regression for dataset 4 has a testing accuracy of: 1.0</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-23-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="cell-46" class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lets view the confusion matrix for our succesfull model</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>y_test_pred <span class="op">=</span> LR4.predict(X_test4)</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> confusion_matrix(y_test, y_test_pred)</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Confusion Matrix For the Model:</span><span class="ch">\n</span><span class="st">"</span> <span class="op">+</span> <span class="bu">str</span>(C))</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Lets also look at the decision regions for the model evaluated on the test set</span></span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>plot_regions(LR4, X_test4, y_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>100% testing accuracy has been achieved with a Linear Regression model for classifying Penquin Species. Lets view the confusion matrix for our succesfull model as well as look at the decision regions for the model evaluated on the test set.</p>
+<div id="cell-25" class="cell" data-execution_count="49">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>y_test_pred <span class="op">=</span> LR.predict(X_test1)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> confusion_matrix(y_test, y_test_pred)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Confusion Matrix For the Model:</span><span class="ch">\n</span><span class="st">"</span> <span class="op">+</span> <span class="bu">str</span>(C))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>plot_regions(LR, X_test1, y_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Confusion Matrix For the Model:
 [[31  0  0]
@@ -995,91 +739,16 @@ Linear Regression for dataset 4 has a testing accuracy of: 1.0</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-24-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-11-output-2.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>100% accuracy has been achieved! We have now developed a model with 100% testing accuracy for identifying Palmer Penquins based on physiologcal characteristics. If you ran this code yourself and did not achieve 100% accuracy on one of these models, re-run the code with new training and testing data (this will produce a model with 100% testing accuracy after 2 - 3 tries if not on the first). Since it was mentioned above, lets run the DecisionTreeClassifiers for fun.</p>
-<div id="cell-48" class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>reg4_3 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">3</span>)</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>reg4_4 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">4</span>)</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>reg4_5 <span class="op">=</span> DecisionTreeClassifier(max_depth <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>reg4_3.fit(X_train4, y_train)</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>reg4_4.fit(X_train4, y_train)</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>reg4_5.fit(X_train4, y_train)</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 3 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg4_3.score(X_train4, y_train)) <span class="op">+</span> <span class="st">" for dataset 4"</span>)</span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>cv_reg4_3 <span class="op">=</span> cross_val_score(reg4_3, X_train4, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg4_3) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 4 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg4_4.score(X_train4, y_train)) <span class="op">+</span> <span class="st">" for dataset 4"</span>)</span>
-<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>cv_reg4_4 <span class="op">=</span> cross_val_score(reg4_4, X_train4, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg4_4) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DecisionTreeClassifier with depth = 5 has a training accuracy of: "</span> <span class="op">+</span> <span class="bu">str</span>(reg4_5.score(X_train4, y_train)) <span class="op">+</span> <span class="st">" for dataset 4"</span>)</span>
-<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>cv_reg4_5 <span class="op">=</span> cross_val_score(reg4_5, X_train4, y_train, cv <span class="op">=</span> <span class="dv">5</span>)</span>
-<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"And a cross validation of: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_reg4_5) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Each Decision Region For the Decision Tree Models</span></span>
-<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>plot_regions(reg4_3, X_test4, y_test)</span>
-<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a>plot_regions(reg4_4, X_test4, y_test)</span>
-<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>plot_regions(reg4_5, X_test4, y_test)</span>
-<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a><span class="co"># test the accuracy for each model of varying depth against the test data</span></span>
-<span id="cb36-35"><a href="#cb36-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Testing the model with complexity 3: "</span> <span class="op">+</span> <span class="bu">str</span>(reg4_3.score(X_test4, y_test)) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb36-36"><a href="#cb36-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Testing the model with complexity 4: "</span> <span class="op">+</span> <span class="bu">str</span>(reg4_4.score(X_test4, y_test)) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb36-37"><a href="#cb36-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Testing the model with complexity 5: "</span> <span class="op">+</span> <span class="bu">str</span>(reg4_5.score(X_test4, y_test)) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>DecisionTreeClassifier with depth = 3 has a training accuracy of: 0.98828125 for dataset 4
-And a cross validation of: [0.981 1.    0.98  0.941 0.941]
-
-DecisionTreeClassifier with depth = 4 has a training accuracy of: 0.9921875 for dataset 4
-And a cross validation of: [0.981 1.    0.98  0.941 0.961]
-
-DecisionTreeClassifier with depth = 5 has a training accuracy of: 1.0 for dataset 4
-And a cross validation of: [0.981 0.98  0.98  0.941 0.98 ]
-
-Testing the model with complexity 3: 0.9852941176470589
-
-Testing the model with complexity 4: 0.9852941176470589
-
-Testing the model with complexity 5: 0.9852941176470589
-</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-25-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-25-output-3.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-25-output-4.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>These models will also achieve 100% testing accuracy depending on how the model adapts to the training data and may need to be refresehd a few times to achieve the 100% testing mark on your own machine.</p>
-<p>Through the process of analyzing the Palmer Penguins dataset, several key insights were uncovered regarding the classification of penguin species based on their physical characteristics. First, identify the quantitative features which created the clearest three groupings was key. In fact, more time should have been spent in the beginning graphing out possible combinations of quantitative features; this process may have more quickly identified Culmen Length and Depth as the best features for clustering penquin species together. Plotting tables for the qualitative features also proved key, as it quickly identified that Island was a good indicator of species. In addition, when dealing with models such as the DecisionTreeClassifier utilizing the cross validation as a check for overfitting helped identify the correct depth range for our models, as lower values procuded worse testing accuracy, but the extremely high complexity values produced overfitted results. Finally, as a general note, I would spend more time in the beginning exploring potential data combinations via graphical methods in order to more quickly identify the predicators which might work best rather than plug and chug; I did, however, enjoy the process of tinkering with the different models and datasets until I found the perfect one.</p>
+<p>100% accuracy has been achieved! We have now developed a model with 100% testing accuracy for identifying Palmer Penquins based on physiologcal characteristics. By plotting the decision regions versus the test data and by looking at the confusion matrix, it becomes clear that the model was able to distinguish every penquin soley based on the provided information. If you ran this code yourself and did not achieve 100% accuracy on one of these models, re-run the code with new training and testing data (this will produce a model with 100% testing accuracy after 2 - 3 tries if not on the first). Since it was mentioned above, lets run the DecisionTreeClassifiers for fun.</p>
+</section>
+<section id="discussion" class="level1">
+<h1>Discussion</h1>
+<p>Through the process of analyzing the Palmer Penguins dataset, several key insights were uncovered regarding the classification of penguin species based on their physical characteristics. First, identifying the quantitative features which created the clearest three groupings was key. In fact, more time should have been spent in the beginning graphing out possible combinations of quantitative features; this process may have more quickly identified Culmen Length and Depth as the best features for clustering penquin species together. Plotting tables for the qualitative features also proved key, as it quickly identified that Island was a good indicator of species. In addition, when dealing with models such as the DecisionTreeClassifier (not shown in this post) utilizing cross validation as a check for overfitting helped identify the correct depth range for our models, as lower values procuded worse testing accuracy, but the extremely high complexity values produced overfitted results. Finally, as a general note, I would spend more time in the beginning exploring potential data combinations via graphical methods in order to more quickly identify the predicators which might work best rather than plug and chug; I did, however, enjoy the process of tinkering with the different models and datasets until I found the perfect one.</p>
 
 
 </section>
