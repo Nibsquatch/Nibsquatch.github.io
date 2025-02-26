@@ -60,7 +60,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -121,6 +121,9 @@ background-image: url(../../img/landscape.png);
 background-size: cover;
       }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -212,12 +215,271 @@ background-size: cover;
 <section id="abstract" class="level1">
 <h1>Abstract</h1>
 </section>
-<section id="data-preparation" class="level1">
-<h1>Data Preparation</h1>
-<div id="cell-3" class="cell" data-execution_count="2">
+<section id="data-exploration" class="level1">
+<h1>Data Exploration</h1>
+<div id="cell-3" class="cell" data-execution_count="74">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/PhilChodrow/ml-notes/main/data/credit-risk/train.csv"</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df_train <span class="op">=</span> pd.read_csv(url)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/PhilChodrow/ml-notes/main/data/credit-risk/train.csv"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>df_train <span class="op">=</span> pd.read_csv(url)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># make a copy to use and view that data</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>df_ <span class="op">=</span> df_train.copy()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>df_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="74">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">person_age</th>
+<th data-quarto-table-cell-role="th">person_income</th>
+<th data-quarto-table-cell-role="th">person_home_ownership</th>
+<th data-quarto-table-cell-role="th">person_emp_length</th>
+<th data-quarto-table-cell-role="th">loan_intent</th>
+<th data-quarto-table-cell-role="th">loan_grade</th>
+<th data-quarto-table-cell-role="th">loan_amnt</th>
+<th data-quarto-table-cell-role="th">loan_int_rate</th>
+<th data-quarto-table-cell-role="th">loan_status</th>
+<th data-quarto-table-cell-role="th">loan_percent_income</th>
+<th data-quarto-table-cell-role="th">cb_person_default_on_file</th>
+<th data-quarto-table-cell-role="th">cb_person_cred_hist_length</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>25</td>
+<td>43200</td>
+<td>RENT</td>
+<td>NaN</td>
+<td>VENTURE</td>
+<td>B</td>
+<td>1200</td>
+<td>9.91</td>
+<td>0</td>
+<td>0.03</td>
+<td>N</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>27</td>
+<td>98000</td>
+<td>RENT</td>
+<td>3.0</td>
+<td>EDUCATION</td>
+<td>C</td>
+<td>11750</td>
+<td>13.47</td>
+<td>0</td>
+<td>0.12</td>
+<td>Y</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>22</td>
+<td>36996</td>
+<td>RENT</td>
+<td>5.0</td>
+<td>EDUCATION</td>
+<td>A</td>
+<td>10000</td>
+<td>7.51</td>
+<td>0</td>
+<td>0.27</td>
+<td>N</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>24</td>
+<td>26000</td>
+<td>RENT</td>
+<td>2.0</td>
+<td>MEDICAL</td>
+<td>C</td>
+<td>1325</td>
+<td>12.87</td>
+<td>1</td>
+<td>0.05</td>
+<td>N</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>29</td>
+<td>53004</td>
+<td>MORTGAGE</td>
+<td>2.0</td>
+<td>HOMEIMPROVEMENT</td>
+<td>A</td>
+<td>15000</td>
+<td>9.63</td>
+<td>0</td>
+<td>0.28</td>
+<td>N</td>
+<td>10</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">26059</td>
+<td>36</td>
+<td>150000</td>
+<td>MORTGAGE</td>
+<td>8.0</td>
+<td>EDUCATION</td>
+<td>A</td>
+<td>3000</td>
+<td>7.29</td>
+<td>0</td>
+<td>0.02</td>
+<td>N</td>
+<td>17</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">26060</td>
+<td>23</td>
+<td>48000</td>
+<td>RENT</td>
+<td>1.0</td>
+<td>VENTURE</td>
+<td>A</td>
+<td>4325</td>
+<td>5.42</td>
+<td>0</td>
+<td>0.09</td>
+<td>N</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">26061</td>
+<td>22</td>
+<td>60000</td>
+<td>RENT</td>
+<td>0.0</td>
+<td>MEDICAL</td>
+<td>B</td>
+<td>15000</td>
+<td>11.71</td>
+<td>0</td>
+<td>0.25</td>
+<td>N</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">26062</td>
+<td>30</td>
+<td>144000</td>
+<td>MORTGAGE</td>
+<td>12.0</td>
+<td>PERSONAL</td>
+<td>C</td>
+<td>35000</td>
+<td>12.68</td>
+<td>0</td>
+<td>0.24</td>
+<td>N</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">26063</td>
+<td>25</td>
+<td>60000</td>
+<td>RENT</td>
+<td>5.0</td>
+<td>EDUCATION</td>
+<td>A</td>
+<td>21450</td>
+<td>7.29</td>
+<td>1</td>
+<td>0.36</td>
+<td>N</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+
+<p>26064 rows × 12 columns</p>
+</div>
+</div>
+</div>
+<p>Lets explore how loan intent varies across age groups</p>
+<div id="cell-5" class="cell" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># first lets add a column for age groups</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_[<span class="st">"age_group"</span>] <span class="op">=</span> df_[<span class="st">"person_age"</span>] <span class="op">//</span> <span class="dv">10</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_[<span class="st">"age_group"</span>][df_[<span class="st">"age_group"</span>] <span class="op">&gt;=</span> <span class="dv">10</span> ] <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the counts of each loan intent within each age group</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>loan_intent_counts <span class="op">=</span> df_.groupby(<span class="st">"age_group"</span>)[<span class="st">"loan_intent"</span>].value_counts().unstack()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>loan_intent_counts <span class="op">=</span> loan_intent_counts.fillna(<span class="dv">0</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert counts to proportions relative to each age group</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>loan_intent_prop <span class="op">=</span> loan_intent_counts.div(loan_intent_counts.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>), axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># visualize the trends of loan intent and age</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>temp <span class="op">=</span> pd.melt(loan_intent_prop)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>temp[<span class="st">"age_group"</span>] <span class="op">=</span> <span class="dv">0</span> <span class="co"># rebuild the age group category</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(temp) <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  temp[<span class="st">"age_group"</span>][i] <span class="op">=</span> (i <span class="op">%</span> <span class="dv">9</span>) <span class="op">+</span> <span class="dv">2</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.barplot(data <span class="op">=</span> temp, x <span class="op">=</span> <span class="st">"age_group"</span>, y <span class="op">=</span> <span class="st">"value"</span>, hue <span class="op">=</span> <span class="st">"loan_intent"</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Age Group"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Proportion"</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Loan Intent by Age"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="71">
+<pre><code>Text(0.5, 1.0, 'Loan Intent by Age')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-3-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Debt Consolidation is relatively evently represtend between laoners aged 20 - 59, dropping off in the 70 - 79 age group. Education is of course more highly represented in younger loaners, aged 20 - 39, but is also extremely high in loaners of 100+ years old. In the 100+ year old group around 50% of all loans taken out are for Education. Home Improvement is of course more common in younger loaners, aged 20 - 59. Medical loans takes up a larger proportion of loans in older loaners, with 100% of loans in 90 - 99 year olds being for medical reasons. Personal loans are most common in loaners aged 50 - 89, but are still prevalent in younger loaners. Venture is spread evenly throughout all age groups but never eclipses more than 25% of loans. An important trend to notice is that in age groups 2-4 there is a fairly even distribution of all loan intents. Now lets look at how loan size varies by length of employment.</p>
+<div id="cell-7" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize how loan size varies by employment length</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#sns.scatterplot(data = df_train, x = "person_emp_length", y = "loan_amnt")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="67">
+<pre><code>0         0.0
+1         3.0
+2         5.0
+3         2.0
+4         2.0
+         ... 
+26059     8.0
+26060     1.0
+26061     0.0
+26062    12.0
+26063     5.0
+Name: person_emp_length, Length: 26064, dtype: float64</code></pre>
+</div>
 </div>
 
 
