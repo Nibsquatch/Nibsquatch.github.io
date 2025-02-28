@@ -217,7 +217,7 @@ background-size: cover;
 </section>
 <section id="data-exploration" class="level1">
 <h1>Data Exploration</h1>
-<div id="cell-3" class="cell" data-execution_count="2">
+<div id="cell-3" class="cell" data-execution_count="35">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
@@ -231,7 +231,7 @@ background-size: cover;
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># make a copy to use and view that data</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>df_ <span class="op">=</span> df_train.copy()</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>df_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+<div class="cell-output cell-output-display" data-execution_count="35">
 <div>
 
 
@@ -427,7 +427,7 @@ background-size: cover;
 </div>
 </div>
 <p>Lets explore how loan intent varies across age groups</p>
-<div id="cell-5" class="cell" data-execution_count="3">
+<div id="cell-5" class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># first lets add a column for age groups</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_[<span class="st">"age_group"</span>] <span class="op">=</span> df_[<span class="st">"person_age"</span>] <span class="op">//</span> <span class="dv">10</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_[<span class="st">"age_group"</span>][df_[<span class="st">"age_group"</span>] <span class="op">&gt;=</span> <span class="dv">10</span> ] <span class="op">=</span> <span class="dv">10</span></span>
@@ -450,7 +450,7 @@ background-size: cover;
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Age Group"</span>)</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Proportion"</span>)</span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Loan Intent by Age"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="36">
 <pre><code>Text(0.5, 1.0, 'Loan Intent by Age')</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -462,7 +462,7 @@ background-size: cover;
 </div>
 </div>
 <p>Debt Consolidation is relatively evently represtend between laoners aged 20 - 59, dropping off in the 70 - 79 age group. Education is of course more highly represented in younger loaners, aged 20 - 39, but is also extremely high in loaners of 100+ years old. In the 100+ year old group around 50% of all loans taken out are for Education. Home Improvement is of course more common in younger loaners, aged 20 - 59. Medical loans takes up a larger proportion of loans in older loaners, with 100% of loans in 90 - 99 year olds being for medical reasons. Personal loans are most common in loaners aged 50 - 89, but are still prevalent in younger loaners. Venture is spread evenly throughout all age groups but never eclipses more than 25% of loans. An important trend to notice is that in age groups 2-4 there is a fairly even distribution of all loan intents. Now lets look at how loan size varies by salary.</p>
-<div id="cell-7" class="cell" data-execution_count="11">
+<div id="cell-7" class="cell" data-execution_count="37">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_2 <span class="op">=</span> df_train.copy()</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df_2[<span class="st">"income_cat"</span>] <span class="op">=</span> df_2[<span class="st">"person_income"</span>] <span class="op">//</span> <span class="dv">100000</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -489,7 +489,7 @@ Name: loan_amnt, dtype: float64</code></pre>
 </div>
 </div>
 <p>While salary (income category) does seem to affect the loan amount, with people having higher salaries taking out larger loans, the higher income categories actually often have lower loan amounts than the lower income categories. This may be a product of people making larger salaries not needing to take out loans as frequently as the middle salaries, which can afford to take out larger loans and pay them back. Let’s also determine what factors seem to be related to higher interest rates.</p>
-<div id="cell-9" class="cell" data-execution_count="25">
+<div id="cell-9" class="cell" data-execution_count="38">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_train.groupby([<span class="st">"loan_int_rate"</span>, <span class="st">"loan_grade"</span>]).size())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>loan_int_rate  loan_grade
@@ -508,7 +508,7 @@ Length: 371, dtype: int64</code></pre>
 </div>
 </div>
 <p>From this snapshot of the larger table, it seems that the high grade loans are associated with the lowest interest rates. Lets explore factors related to loan grades by grouping.</p>
-<div id="cell-11" class="cell">
+<div id="cell-11" class="cell" data-execution_count="39">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>temp <span class="op">=</span> df_train.groupby(<span class="st">"loan_grade"</span>)[[<span class="st">"person_income"</span>, <span class="st">"loan_percent_income"</span>, <span class="st">"loan_amnt"</span>]].mean()</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -523,22 +523,10 @@ E            70110.929215             0.204234  12805.501931
 F            77411.340426             0.217979  14759.042553
 G            74609.408163             0.230816  16226.020408</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="32">
-<pre><code>loan_grade
-A    66058.338922
-B    66230.171995
-C    65430.863338
-D    63966.533172
-E    70110.929215
-F    77411.340426
-G    74609.408163
-Name: person_income, dtype: float64</code></pre>
-</div>
 </div>
 <p>As we can see from this datatable, loan grade is directly correlated with lower percent of total income. Meaning that higher quality loans, with lower interest rates are associated with loaners whose loan takes up the smallest percent of their total income. This is likely related to the loan taking up a lower percent of their income making it less likely for them to default on the loan. It also seems to follow that people with higher income tend to take out larger loans.</p>
-<div id="cell-13" class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.scatterplot(data <span class="op">=</span> temp, x <span class="op">=</span> temp[<span class="st">"person_income"</span>], y <span class="op">=</span> <span class="st">"loan_amnt"</span>, hue <span class="op">=</span> <span class="st">"loan_percent_income"</span>, legend <span class="op">=</span> <span class="st">"brief"</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ax</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-13" class="cell" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data <span class="op">=</span> temp, x <span class="op">=</span> temp[<span class="st">"person_income"</span>], y <span class="op">=</span> <span class="st">"loan_amnt"</span>, hue <span class="op">=</span> <span class="st">"loan_percent_income"</span>, legend <span class="op">=</span> <span class="st">"brief"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
