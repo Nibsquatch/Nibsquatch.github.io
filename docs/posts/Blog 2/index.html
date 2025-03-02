@@ -217,7 +217,7 @@ background-size: cover;
 </section>
 <section id="data-exploration" class="level1">
 <h1>Data Exploration</h1>
-<div id="cell-3" class="cell" data-execution_count="97">
+<div id="cell-3" class="cell" data-execution_count="165">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
@@ -232,7 +232,7 @@ background-size: cover;
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># make a copy to use and view that data</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>df_ <span class="op">=</span> df_train.copy()</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>df_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="97">
+<div class="cell-output cell-output-display" data-execution_count="165">
 <div>
 
 
@@ -428,7 +428,7 @@ background-size: cover;
 </div>
 </div>
 <p>Lets explore how loan intent varies across age groups</p>
-<div id="cell-5" class="cell" data-execution_count="98">
+<div id="cell-5" class="cell" data-execution_count="166">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># first lets add a column for age groups</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_[<span class="st">"age_group"</span>] <span class="op">=</span> df_[<span class="st">"person_age"</span>] <span class="op">//</span> <span class="dv">10</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_[<span class="st">"age_group"</span>][df_[<span class="st">"age_group"</span>] <span class="op">&gt;=</span> <span class="dv">10</span> ] <span class="op">=</span> <span class="dv">10</span></span>
@@ -451,7 +451,7 @@ background-size: cover;
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Age Group"</span>)</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Proportion"</span>)</span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Loan Intent by Age"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="98">
+<div class="cell-output cell-output-display" data-execution_count="166">
 <pre><code>Text(0.5, 1.0, 'Loan Intent by Age')</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -463,7 +463,7 @@ background-size: cover;
 </div>
 </div>
 <p>The chart indicates that personal loans are most common among individuals aged 20-29, 40-49, and 90-99, suggesting a consistent need for general-purpose borrowing across different life stages. Medical loans peak in the 40-49 and 50-59 age groups, likely due to increasing healthcare expenses. Education loans spike in the 70-79 age group, which may indicate late-stage career shifts or funding for dependents. Debt consolidation loans are relatively steady, with moderate representation in the 30-39, 50-59, and 60-69 age groups. Home improvement loans have lower proportions overall but see slight increases among borrowers aged 20-29 and 80-89. Venture loans are sporadic, with small peaks in the 50-59 and 60-69 age groups, possibly reflecting mid-life entrepreneurial activity. These trends highlight how borrowing needs evolve across different age brackets.</p>
-<div id="cell-7" class="cell" data-execution_count="99">
+<div id="cell-7" class="cell" data-execution_count="167">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_2 <span class="op">=</span> df_train.copy()</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df_2[<span class="st">"income_cat"</span>] <span class="op">=</span> df_2[<span class="st">"person_income"</span>] <span class="op">//</span> <span class="dv">100000</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -488,7 +488,7 @@ Name: loan_amnt, dtype: float64</code></pre>
 </div>
 </div>
 <p>While salary (income category) does seem to affect the loan amount, with people having higher salaries taking out larger loans, the higher income categories actually often have lower loan amounts than the lower income categories. This may be a product of people making larger salaries not needing to take out loans as frequently as the middle salaries, which can afford to take out larger loans and pay them back. Let’s also determine what factors seem to be related to higher interest rates.</p>
-<div id="cell-9" class="cell" data-execution_count="100">
+<div id="cell-9" class="cell" data-execution_count="168">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_train.groupby([<span class="st">"loan_int_rate"</span>, <span class="st">"loan_grade"</span>]).size())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>loan_int_rate  loan_grade
@@ -507,7 +507,7 @@ Length: 371, dtype: int64</code></pre>
 </div>
 </div>
 <p>From this snapshot of the larger table, it seems that the high grade loans are associated with the lowest interest rates. Lets explore factors related to loan grades by grouping.</p>
-<div id="cell-11" class="cell" data-execution_count="101">
+<div id="cell-11" class="cell" data-execution_count="169">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>temp <span class="op">=</span> df_train.groupby(<span class="st">"loan_grade"</span>)[[<span class="st">"person_income"</span>, <span class="st">"loan_percent_income"</span>, <span class="st">"loan_amnt"</span>]].mean()</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -524,7 +524,7 @@ G            77342.477273             0.243409  17384.659091</code></pre>
 </div>
 </div>
 <p>As we can see from this datatable, loan grade is directly correlated with lower percent of total income. Meaning that higher quality loans, with lower interest rates are associated with loaners whose loan takes up the smallest percent of their total income. This is likely related to the loan taking up a lower percent of their income making it less likely for them to default on the loan. It also seems to follow that people with higher income tend to take out larger loans.</p>
-<div id="cell-13" class="cell" data-execution_count="102">
+<div id="cell-13" class="cell" data-execution_count="170">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data <span class="op">=</span> temp, x <span class="op">=</span> temp[<span class="st">"person_income"</span>], y <span class="op">=</span> <span class="st">"loan_amnt"</span>, hue <span class="op">=</span> <span class="st">"loan_percent_income"</span>, legend <span class="op">=</span> <span class="st">"brief"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -539,7 +539,7 @@ G            77342.477273             0.243409  17384.659091</code></pre>
 <section id="feature-selection-weight-assessment" class="level1">
 <h1>Feature Selection &amp; Weight Assessment</h1>
 <p>Select the predictor and target variables related to loan grade.</p>
-<div id="cell-17" class="cell">
+<div id="cell-17" class="cell" data-execution_count="171">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># select the predictor variables identified with loan grade. Also the include the loaners default history</span></span>
@@ -566,7 +566,7 @@ G            77342.477273             0.243409  17384.659091</code></pre>
 <span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X_model, y_model, test_size<span class="op">=</span><span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Fit a Linear Regression model to the data and assess its accuracy of prediction. Try all combinations of predictors. Once a good model is fit, pull out the weight coefficient to use for a linear score based classifier.</p>
-<div id="cell-19" class="cell">
+<div id="cell-19" class="cell" data-execution_count="172">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> itertools <span class="im">import</span> combinations</span>
@@ -598,42 +598,49 @@ G            77342.477273             0.243409  17384.659091</code></pre>
 <span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Store results</span></span>
 <span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>        results.append({<span class="st">"features"</span>: test_cols, <span class="st">"accuracy"</span>: accuracy})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-20" class="cell" data-execution_count="143">
+<p>From the list of feature combinations, pull out the top 5 and retest them against the premade training and testing data. Once the best from this list has been identified, verify its accuracy with cross validation to check for overfitting. If the features pass, pull out the weights coefficient to use for a linear score based classifier.</p>
+<div id="cell-21" class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># select the top results by accuracy</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>best_features <span class="op">=</span> pd.DataFrame(results).sort_values(by <span class="op">=</span> <span class="st">"accuracy"</span>, ascending <span class="op">=</span> <span class="va">False</span>).head(<span class="dv">5</span>)[<span class="st">"features"</span>].tolist()</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>best_features</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="143">
-<pre><code>[['person_income',
-  'loan_amnt',
-  'loan_percent_income',
-  'loan_int_rate',
-  'weighted_interest',
-  'past_default_yes'],
- ['person_income',
-  'loan_amnt',
-  'loan_percent_income',
-  'loan_int_rate',
-  'weighted_interest',
-  'past_default_no'],
- ['person_income',
-  'loan_amnt',
-  'loan_percent_income',
-  'loan_int_rate',
-  'weighted_interest'],
- ['person_income',
-  'loan_amnt',
-  'loan_percent_income',
-  'loan_int_rate',
-  'weighted_interest',
-  'past_default_yes',
-  'past_default_no'],
- ['loan_amnt',
-  'loan_percent_income',
-  'loan_int_rate',
-  'weighted_interest',
-  'past_default_no']]</code></pre>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>true_predictors <span class="op">=</span> []</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>best_acc <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> features <span class="kw">in</span> best_features:</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># fit a model to the feature list</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    LR_test <span class="op">=</span> LogisticRegression()</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    m_test <span class="op">=</span> LR_test.fit(X_train[features], y_train)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    y_pred <span class="op">=</span> LR_test.predict(X_test[features])</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    acc <span class="op">=</span> accuracy_score(y_test, y_pred)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> acc <span class="op">&gt;</span> best_acc:</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        best_acc <span class="op">=</span> acc</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        true_predictors <span class="op">=</span> features</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"The predictors with the highest testing accuracy are: "</span> <span class="op">+</span> <span class="bu">str</span>(true_predictors) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">Accuracy = "</span> <span class="op">+</span> <span class="bu">str</span>(best_acc))</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Check with cross validation</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>LR_real <span class="op">=</span> LogisticRegression()</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>m_real <span class="op">=</span> LR_real.fit(X_train[true_predictors], y_train)</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>cv_scores_LR <span class="op">=</span> cross_val_score(LR_real, X_test[true_predictors], y_test, cv <span class="op">=</span> <span class="dv">5</span>)</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Cross validation for the selected predictors: "</span> <span class="op">+</span> <span class="bu">str</span>(cv_scores_LR))</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="co"># store the weight coefficients for this model to build our linear score function</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> m_real.coef_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The predictors with the highest testing accuracy are: ['loan_amnt', 'loan_percent_income', 'loan_int_rate', 'weighted_interest', 'past_default_yes']
+Accuracy = 0.817765168048887
+Cross validation for the selected predictors: [0.7917121  0.80261723 0.80676856 0.80895197 0.819869  ]</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="174">
+<pre><code>array([[ 3.58356674e-05,  4.29862403e+00,  3.67678136e-01,
+        -3.36916109e-06,  7.87625419e-01]])</code></pre>
 </div>
 </div>
+<p>Upon inspecting accuracy versus the overall test set income, loan amount, percent income, interest rate, weighted interest, and past default history were selected as the best predictor variables based purly on accuracy. These predictors also had reasonable cross validation scores that were similar to the overall testing accuracy; this implies that the model is consisent and not overfit. The weight constants from this model were then pulled out and stored for later used in a linear score function.</p>
 
 
 </section>
