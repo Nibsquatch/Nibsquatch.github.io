@@ -642,7 +642,7 @@ Cross validation for the selected predictors: [0.82006543 0.82333697 0.81877729 
 <section id="optimizing-a-linear-score-classification" class="level1">
 <h1>Optimizing a Linear Score Classification</h1>
 <p>Start by defining our linear score function using our weight vector and our classification function with an arbitrary starting threshold. We will then optimize this threshold such that the bank makes the largest possible profit per loan.</p>
-<div id="cell-25" class="cell" data-execution_count="38">
+<div id="cell-25" class="cell" data-execution_count="46">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Performs the dot product between the data vector X and the weight vector w</span></span>
@@ -666,7 +666,7 @@ Cross validation for the selected predictors: [0.82006543 0.82333697 0.81877729 
 <span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> score(X_model[true_predictors], w)</span>
 <span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, figsize <span class="op">=</span> (<span class="dv">6</span>, <span class="dv">4</span>))</span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> np.linspace(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">501</span>):</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> np.linspace(<span class="op">-</span><span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">501</span>):</span>
 <span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    X_model[<span class="st">"y_pred"</span>] <span class="op">=</span> scores <span class="op">&gt;=</span> t</span>
 <span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    X_model[<span class="st">"tn"</span>] <span class="op">=</span> (X_model[<span class="st">"y_pred"</span>] <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (y_train <span class="op">==</span> <span class="dv">0</span>)</span>
@@ -692,6 +692,46 @@ Cross validation for the selected predictors: [0.82006543 0.82333697 0.81877729 
 </div>
 </div>
 </div>
+<p>Maximization of the bank’s profit results in a threshold of 8.260, this value has been stored as the best threshold. Lets now test the model with our optimal weight vector and threshold against new testing data.</p>
+<div id="cell-27" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/PhilChodrow/ml-notes/main/data/credit-risk/test.csv"</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="op">=</span> pd.read_csv(url)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>df_test <span class="op">=</span> df_test.dropna()</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create binary indicators for past defaults</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"past_default_yes"</span>] <span class="op">=</span> df_test[<span class="st">"cb_person_default_on_file"</span>] <span class="op">==</span> <span class="st">"Y"</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"past_default_no"</span>] <span class="op">=</span> df_test[<span class="st">"cb_person_default_on_file"</span>] <span class="op">==</span> <span class="st">"N"</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate weighted default predictor</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"weighted_default"</span>] <span class="op">=</span> df_test[<span class="st">"loan_percent_income"</span>] <span class="op">*</span> (<span class="dv">1</span> <span class="op">+</span>  df_test[<span class="st">"past_default_yes"</span>])</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate weigthed interest rate predictor</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"weighted_interest"</span>] <span class="op">=</span> (<span class="dv">1</span> <span class="op">+</span> df_test[<span class="st">"loan_int_rate"</span>]) <span class="op">*</span> df_test[<span class="st">"loan_amnt"</span>] <span class="op">*</span> (<span class="dv">1</span> <span class="op">+</span> df_test[<span class="st">"past_default_yes"</span>])</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop the original categorical column</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>df_test.drop(<span class="st">"cb_person_default_on_file"</span>, axis<span class="op">=</span><span class="dv">1</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co"># initialize the benefit column</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"benefit"</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate the score array</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> score(df_test[true_predictors],w)</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"y_pred"</span>] <span class="op">=</span> scores <span class="op">&gt;=</span> best_threshold</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"tn"</span>] <span class="op">=</span> (df_test[<span class="st">"y_pred"</span>] <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (df_test[<span class="st">"loan_status"</span>] <span class="op">==</span> <span class="dv">0</span>)    </span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"fn"</span>] <span class="op">=</span> (df_test[<span class="st">"y_pred"</span>] <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (df_test[<span class="st">"loan_status"</span>] <span class="op">==</span> <span class="dv">1</span>)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"benefit"</span>][df_test[<span class="st">"tn"</span>]] <span class="op">=</span> df_test[<span class="st">"loan_amnt"</span>] <span class="op">*</span> (<span class="dv">1</span> <span class="op">+</span> <span class="fl">0.25</span> <span class="op">*</span> df_test[<span class="st">"loan_int_rate"</span>]) <span class="op">**</span> <span class="dv">10</span> <span class="op">-</span> df_test[<span class="st">"loan_amnt"</span>]</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"benefit"</span>][df_test[<span class="st">"fn"</span>]] <span class="op">=</span> df_test[<span class="st">"loan_amnt"</span>] <span class="op">*</span> (<span class="dv">1</span> <span class="op">+</span> <span class="fl">0.25</span> <span class="op">*</span> df_test[<span class="st">"loan_int_rate"</span>]) <span class="op">**</span> <span class="dv">3</span> <span class="op">-</span> <span class="fl">1.7</span> <span class="op">*</span> df_test[<span class="st">"loan_amnt"</span>]</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>average_benefit <span class="op">=</span> np.<span class="bu">sum</span>(df_test[<span class="st">"benefit"</span>]) <span class="op">/</span> <span class="bu">len</span>(df_test)</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"The expected profit per buyer is: "</span> <span class="op">+</span> <span class="bu">str</span>(average_benefit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The expected profit per buyer is: 14236812169.516094</code></pre>
+</div>
+</div>
+<p>The expected profit per buyer on the test set is almost identical to the expected profit per buyer on the test set.</p>
 
 
 </section>
