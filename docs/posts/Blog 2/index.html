@@ -737,13 +737,14 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 <section id="evaluating-model-fairness" class="level1">
 <h1>Evaluating Model Fairness</h1>
 <p>Lets explore if some loaners are more or less likely to receive loans based on their age</p>
-<div id="cell-30" class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remake age groups in 10 year gaps</span></span>
+<div id="cell-30" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remake age groups in 10 year gaps and calculate the difference in default prediction vs reality</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"age_group"</span>] <span class="op">=</span> df_test[<span class="st">"person_age"</span>] <span class="op">//</span> <span class="dv">10</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"diff"</span>] <span class="op">=</span> df_test[<span class="st">"y_pred"</span>] <span class="op">-</span> df_test[<span class="st">"loan_status"</span>]</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>temp <span class="op">=</span> df_test.groupby(<span class="st">"age_group"</span>)[[<span class="st">"loan_status"</span>, <span class="st">"y_pred"</span>, <span class="st">"diff"</span>]].mean().reset_index()</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>temp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Display this data as a table</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>temp <span class="op">=</span> df_test.groupby(<span class="st">"age_group"</span>)[[<span class="st">"loan_status"</span>, <span class="st">"y_pred"</span>, <span class="st">"diff"</span>]].mean().reset_index()</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>temp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="31">
 <div>
 
@@ -808,11 +809,13 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 </div>
 </div>
 <p>In almost all age groups (age group 7 only has two individuals) the algorithm underpredicts the loan default rate. However, two age groups which are far less likely to get a loan than other groups (excluding group 7), are age group 20-29 and 60-69. Despite, the algorithim underpredicting the default rate in this age group, especially in the 60-69 age group, these groups are still predicted to be much more likely to defualt than the other age groups. Lets now look at the difficulty of getting loans based on loan intent.</p>
-<div id="cell-32" class="cell" data-execution_count="43">
+<div id="cell-32" class="cell" data-execution_count="58">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>temp2 <span class="op">=</span> df_test.copy()</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>temp2.groupby(<span class="st">"loan_intent"</span>)[[<span class="st">"y_pred"</span>, <span class="st">"loan_status"</span>]].mean()</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>temp2_melted <span class="op">=</span> pd.melt(temp2, id_vars <span class="op">=</span> <span class="st">"loan_intent"</span>, value_vars <span class="op">=</span> [<span class="st">"y_pred"</span>, <span class="st">"loan_status"</span>], var_name <span class="op">=</span> <span class="st">"Type"</span>, value_name <span class="op">=</span> <span class="st">"Val"</span>)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>sns.barplot(data <span class="op">=</span> temp2_melted, x <span class="op">=</span> <span class="st">"loan_intent"</span>, y <span class="op">=</span> <span class="st">"Val"</span>, hue <span class="op">=</span> <span class="st">"Type"</span>, palette <span class="op">=</span> <span class="st">"BuPu"</span>, saturation <span class="op">=</span> <span class="fl">0.5</span>, width <span class="op">=</span> <span class="fl">.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Melt the data so it can be plotted in a</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>temp2_melted <span class="op">=</span> pd.melt(temp2, id_vars <span class="op">=</span> <span class="st">"loan_intent"</span>, value_vars <span class="op">=</span> [<span class="st">"y_pred"</span>, <span class="st">"loan_status"</span>], var_name <span class="op">=</span> <span class="st">"Type"</span>, value_name <span class="op">=</span> <span class="st">"Proportion of Loan Status"</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>sns.barplot(data <span class="op">=</span> temp2_melted, y <span class="op">=</span> <span class="st">"loan_intent"</span>, x <span class="op">=</span> <span class="st">"Proportion of Loan Status"</span>, hue <span class="op">=</span> <span class="st">"Type"</span>, palette <span class="op">=</span> <span class="st">"BuPu"</span>, saturation <span class="op">=</span> <span class="fl">0.5</span>, orient <span class="op">=</span> <span class="st">"h"</span>, errorbar <span class="op">=</span> <span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -821,6 +824,27 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 </div>
 </div>
 </div>
+<p>Medical loans have the highest predicted default rate making them the hardes loans to get, however medical loans do have the second highest default rate. Education, Personal, and Debt Consolidation are the next hardest loans to get. Venture loans are predicted to default less often than the previous, and Home Improvement loans are predicted to default the least, despite having the third highest actual default rate. In all cases, the default rate was predicted to be less than than it ended up being. Now, lets examine how gross income affects the ease with which credit can be obtained.</p>
+<div id="cell-34" class="cell" data-execution_count="60">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>temp3 <span class="op">=</span> df_test.copy()</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Group income into categories separated by $25,000 in income</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>temp3[<span class="st">"income_group"</span>] <span class="op">=</span> temp3[<span class="st">"person_income"</span>] <span class="op">//</span> <span class="dv">25000</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>temp3[<span class="st">"income_group"</span>][temp3[<span class="st">"income_group"</span>] <span class="op">&gt;=</span> <span class="dv">10</span> ] <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Melt the data so it can be plotted in a bar plot</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>temp3_melted <span class="op">=</span> pd.melt(temp3, id_vars <span class="op">=</span> <span class="st">"income_group"</span>, value_vars <span class="op">=</span> [<span class="st">"y_pred"</span>, <span class="st">"loan_status"</span>], var_name <span class="op">=</span> <span class="st">"Type"</span>, value_name <span class="op">=</span> <span class="st">"Proportion of Loan Status"</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>sns.barplot(data <span class="op">=</span> temp3_melted, x <span class="op">=</span> <span class="st">"income_group"</span>, y <span class="op">=</span> <span class="st">"Proportion of Loan Status"</span>, hue <span class="op">=</span> <span class="st">"Type"</span>, palette <span class="op">=</span> <span class="st">"BuPu"</span>, saturation <span class="op">=</span> <span class="fl">0.5</span>, errorbar <span class="op">=</span> <span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In this model, lower income is strongly associated with greater likelihood to default, making it much harder get loans at low income. While lower income is generally associated with higher default rates, it is unrealistic that the model predicts loaners making more than $75,000 to pay back their loans 100% of the time. In fact, the second highest default rate is actually in the $200,000 - $224,999 income category.</p>
 
 
 </section>
