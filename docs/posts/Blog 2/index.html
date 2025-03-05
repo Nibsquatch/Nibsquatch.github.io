@@ -691,7 +691,7 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 </div>
 </div>
 </div>
-<p>Maximization of the bank’s profit results in a threshold of 2.1, with a profit per buyer of $1301.86. The value of the threshold has been stored for later use. Lets now test the model with our optimal weight vector and threshold against new testing data.</p>
+<p>Maximization of the bank’s profit results in a threshold of 2.1, with a profit per buyer of 1301.86. The value of the threshold has been stored for later use. Lets now test the model with our optimal weight vector and threshold against new testing data.</p>
 <div id="cell-26" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/PhilChodrow/ml-notes/main/data/credit-risk/test.csv"</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="op">=</span> pd.read_csv(url)</span>
@@ -732,7 +732,7 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 <pre><code>The expected profit per buyer is: $1227.71</code></pre>
 </div>
 </div>
-<p>The expected profit per buyer on the test set ($1301.86) is only slightly lower than the expected profit per buyer on the training set ($1227.71). Thus our model was able to generalize from the training set.</p>
+<p>The expected profit per buyer on the test set (1301.86) is only slightly lower than the expected profit per buyer on the training set (1227.71). Thus our model was able to generalize from the training set.</p>
 </section>
 <section id="evaluating-model-fairness" class="level1">
 <h1>Evaluating Model Fairness</h1>
@@ -844,7 +844,7 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 </div>
 </div>
 </div>
-<p>In this model, lower income is strongly associated with greater likelihood to default, making it much harder get loans at low income. While lower income is generally associated with higher default rates, it is unrealistic that the model predicts loaners making more than $75,000 to pay back their loans 100% of the time. In fact, the second highest default rate is actually in the $200,000 - $224,999 income category.</p>
+<p>In this model, lower income is strongly associated with greater likelihood to default, making it much harder get loans at low income. While lower income is generally associated with higher default rates, it is unrealistic that the model predicts loaners making more than 75,000 to pay back their loans 100% of the time. In fact, the second highest default rate is actually in the 200,000 - 224,999 income category.</p>
 
 
 </section>
