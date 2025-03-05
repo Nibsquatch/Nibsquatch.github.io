@@ -8,7 +8,7 @@
 
 <meta name="author" content="Ryan Mauney">
 <meta name="dcterms.date" content="2024-03-05">
-<meta name="description" content="Using a linear score based classifier to maximize bank profits on loans">
+<meta name="description" content="This blog post identifies variables in individual loaners personal information and history to identify the best variables to fit a linear score based classifier in order to maximize bank profits per buyer.">
 
 <title>Blog 2 - Maximizing Loan Profit – My Awesome CSCI 0451 Blog</title>
 <style>
@@ -174,7 +174,7 @@ background-size: cover;
       <h1 class="title">Blog 2 - Maximizing Loan Profit</h1>
                   <div>
         <div class="description">
-          Using a linear score based classifier to maximize bank profits on loans
+          This blog post identifies variables in individual loaners personal information and history to identify the best variables to fit a linear score based classifier in order to maximize bank profits per buyer.
         </div>
       </div>
                 </div>
@@ -212,9 +212,13 @@ background-size: cover;
 
 
 
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Access to bank loans plays a critical role in enabling individuals and businesses to finance important expenses, from home purchases to entrepreneurial ventures. This blog post explores the landscape of bank lending, focusing on the factors influencing loan approval, interest rates, and default risks. Variables such as loan intent were explored across age groups, as well as the variables affecting load grade. High grade loans (A) are associated with individuals at low risk of defaulting. Through exploratory data analysis income, loan amount, loan as a percent of income, loan interest rate, and past default hisotry were identified as variables most stronly associated with loan quality. Weigthed variables that took into account past default history as well as percent income, loan amount, and interst rate were also generated. Linear Regression was then used to determine the combination of these variables that could most accurately predict whether or not a loaner would default. The weight vector for these variables was taken to build a linear score function, and the score function threshold was optimized to maximize bank profit per buyer in the final model. In the final model, loan as a percent of income, loan interest weight, weighted interest rate, and past default history were selected as predictors with a threshold of t = 2.2, resulting in an expected profit per buyer of 1294.33.</p>
+</section>
 <section id="data-exploration" class="level1">
 <h1>Data Exploration</h1>
-<div id="cell-2" class="cell" data-execution_count="2">
+<div id="cell-4" class="cell" data-execution_count="61">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
@@ -230,7 +234,7 @@ background-size: cover;
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># make a copy to use and view that data</span></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>df_ <span class="op">=</span> df_train.copy()</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>df_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+<div class="cell-output cell-output-display" data-execution_count="61">
 <div>
 
 
@@ -426,7 +430,7 @@ background-size: cover;
 </div>
 </div>
 <p>Lets explore how loan intent varies across age groups</p>
-<div id="cell-4" class="cell" data-execution_count="3">
+<div id="cell-6" class="cell" data-execution_count="62">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># first lets add a column for age groups</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_[<span class="st">"age_group"</span>] <span class="op">=</span> df_[<span class="st">"person_age"</span>] <span class="op">//</span> <span class="dv">10</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_[<span class="st">"age_group"</span>][df_[<span class="st">"age_group"</span>] <span class="op">&gt;=</span> <span class="dv">10</span> ] <span class="op">=</span> <span class="dv">10</span></span>
@@ -449,7 +453,7 @@ background-size: cover;
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Age Group"</span>)</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Proportion"</span>)</span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Loan Intent by Age"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="62">
 <pre><code>Text(0.5, 1.0, 'Loan Intent by Age')</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -461,7 +465,7 @@ background-size: cover;
 </div>
 </div>
 <p>The chart indicates that personal loans are most common among individuals aged 20-29, 40-49, and 90-99, suggesting a consistent need for general-purpose borrowing across different life stages. Medical loans peak in the 40-49 and 50-59 age groups, likely due to increasing healthcare expenses. Education loans spike in the 70-79 age group, which may indicate late-stage career shifts or funding for dependents. Debt consolidation loans are relatively steady, with moderate representation in the 30-39, 50-59, and 60-69 age groups. Home improvement loans have lower proportions overall but see slight increases among borrowers aged 20-29 and 80-89. Venture loans are sporadic, with small peaks in the 50-59 and 60-69 age groups, possibly reflecting mid-life entrepreneurial activity. These trends highlight how borrowing needs evolve across different age brackets.</p>
-<div id="cell-6" class="cell" data-execution_count="4">
+<div id="cell-8" class="cell" data-execution_count="63">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_2 <span class="op">=</span> df_train.copy()</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df_2[<span class="st">"income_cat"</span>] <span class="op">=</span> df_2[<span class="st">"person_income"</span>] <span class="op">//</span> <span class="dv">100000</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -486,7 +490,7 @@ Name: loan_amnt, dtype: float64</code></pre>
 </div>
 </div>
 <p>While salary (income category) does seem to affect the loan amount, with people having higher salaries taking out larger loans, the higher income categories actually often have lower loan amounts than the lower income categories. This may be a product of people making larger salaries not needing to take out loans as frequently as the middle salaries, which can afford to take out larger loans and pay them back. Let’s also determine what factors seem to be related to higher interest rates.</p>
-<div id="cell-8" class="cell" data-execution_count="5">
+<div id="cell-10" class="cell" data-execution_count="64">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_train.groupby([<span class="st">"loan_int_rate"</span>, <span class="st">"loan_grade"</span>]).size())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>loan_int_rate  loan_grade
@@ -505,7 +509,7 @@ Length: 371, dtype: int64</code></pre>
 </div>
 </div>
 <p>From this snapshot of the larger table, it seems that the high grade loans are associated with the lowest interest rates. Lets explore factors related to loan grades by grouping.</p>
-<div id="cell-10" class="cell" data-execution_count="6">
+<div id="cell-12" class="cell" data-execution_count="65">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>temp <span class="op">=</span> df_train.groupby(<span class="st">"loan_grade"</span>)[[<span class="st">"person_income"</span>, <span class="st">"loan_percent_income"</span>, <span class="st">"loan_amnt"</span>]].mean()</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -522,7 +526,7 @@ G            77342.477273             0.243409  17384.659091</code></pre>
 </div>
 </div>
 <p>As we can see from this datatable, loan grade is directly correlated with lower percent of total income. Meaning that higher quality loans, with lower interest rates are associated with loaners whose loan takes up the smallest percent of their total income. This is likely related to the loan taking up a lower percent of their income making it less likely for them to default on the loan. It also seems to follow that people with higher income tend to take out larger loans.</p>
-<div id="cell-12" class="cell" data-execution_count="7">
+<div id="cell-14" class="cell" data-execution_count="66">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data <span class="op">=</span> temp, x <span class="op">=</span> temp[<span class="st">"person_income"</span>], y <span class="op">=</span> <span class="st">"loan_amnt"</span>, hue <span class="op">=</span> <span class="st">"loan_percent_income"</span>, legend <span class="op">=</span> <span class="st">"brief"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -537,7 +541,7 @@ G            77342.477273             0.243409  17384.659091</code></pre>
 <section id="feature-selection-weight-assessment" class="level1">
 <h1>Feature Selection &amp; Weight Assessment</h1>
 <p>Select the predictor and target variables related to loan grade.</p>
-<div id="cell-16" class="cell" data-execution_count="8">
+<div id="cell-18" class="cell" data-execution_count="67">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># select the predictor variables identified with loan grade. Also the include the loaners default history</span></span>
@@ -564,7 +568,7 @@ G            77342.477273             0.243409  17384.659091</code></pre>
 <span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X_model, y_model, test_size<span class="op">=</span><span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Fit a Linear Regression model to the data and assess its accuracy of prediction. Try all combinations of predictors. Once a good model is fit, pull out the weight coefficient to use for a linear score based classifier.</p>
-<div id="cell-18" class="cell" data-execution_count="9">
+<div id="cell-20" class="cell" data-execution_count="68">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> itertools <span class="im">import</span> combinations</span>
@@ -597,7 +601,7 @@ G            77342.477273             0.243409  17384.659091</code></pre>
 <span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>        results.append({<span class="st">"features"</span>: test_cols, <span class="st">"accuracy"</span>: accuracy})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>From the list of feature combinations, pull out the top 5 and retest them against the premade training and testing data. Once the best from this list has been identified, verify its accuracy with cross validation to check for overfitting. If the features pass, pull out the weights coefficient to use for a linear score based classifier.</p>
-<div id="cell-20" class="cell" data-execution_count="10">
+<div id="cell-22" class="cell" data-execution_count="69">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># select the top results by accuracy</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>best_features <span class="op">=</span> pd.DataFrame(results).sort_values(by <span class="op">=</span> <span class="st">"accuracy"</span>, ascending <span class="op">=</span> <span class="va">False</span>).head(<span class="dv">5</span>)[<span class="st">"features"</span>].tolist()</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -631,9 +635,9 @@ G            77342.477273             0.243409  17384.659091</code></pre>
 <span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> w.shape</span>
 <span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> w.reshape(s[<span class="dv">1</span>], s[<span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>The predictors with the highest testing accuracy are: ['loan_amnt', 'loan_percent_income']
-Accuracy = 0.8197293758184199
-Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 0.80895197 0.81004367]</code></pre>
+<pre><code>The predictors with the highest testing accuracy are: ['loan_percent_income', 'loan_int_rate', 'weighted_interest', 'past_default_yes', 'past_default_no']
+Accuracy = 0.8334788302051506
+Cross validation for the selected predictors: [0.81788441 0.80152672 0.83406114 0.82423581 0.82751092]</code></pre>
 </div>
 </div>
 <p>Upon inspecting accuracy versus the overall test set income the predictors above were selected as the best variables based purely on accuracy. These predictors also had reasonable cross validation scores that were similar to the overall testing accuracy; this implies that the model is consisent and not overfit. The weight constants from this model were then pulled out and stored for later used in a linear score function.</p>
@@ -641,7 +645,7 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 <section id="optimizing-a-linear-score-classification" class="level1">
 <h1>Optimizing a Linear Score Classification</h1>
 <p>Start by defining our linear score function using our weight vector and our classification function with an arbitrary starting threshold. We will then optimize this threshold such that the bank makes the largest possible profit per loan.</p>
-<div id="cell-24" class="cell" data-execution_count="11">
+<div id="cell-26" class="cell" data-execution_count="70">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Performs the dot product between the data vector X and the weight vector w</span></span>
@@ -691,8 +695,8 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 </div>
 </div>
 </div>
-<p>Maximization of the bank’s profit results in a threshold of 2.1, with a profit per buyer of 1301.86. The value of the threshold has been stored for later use. Lets now test the model with our optimal weight vector and threshold against new testing data.</p>
-<div id="cell-26" class="cell" data-execution_count="12">
+<p>Maximization of the bank’s profit results in a threshold of 2.2, with a profit per buyer of 1294.33. The value of the threshold has been stored for later use. Lets now test the model with our optimal weight vector and threshold against new testing data.</p>
+<div id="cell-28" class="cell" data-execution_count="71">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/PhilChodrow/ml-notes/main/data/credit-risk/test.csv"</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="op">=</span> pd.read_csv(url)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -729,15 +733,15 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 <span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>average_benefit <span class="op">=</span> np.<span class="bu">sum</span>(df_test[<span class="st">"benefit"</span>]) <span class="op">/</span> <span class="bu">len</span>(df_test)</span>
 <span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"The expected profit per buyer is: $"</span> <span class="op">+</span> <span class="bu">str</span>(<span class="bu">round</span>(average_benefit, <span class="dv">2</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>The expected profit per buyer is: $1227.71</code></pre>
+<pre><code>The expected profit per buyer is: $1256.42</code></pre>
 </div>
 </div>
-<p>The expected profit per buyer on the test set (1301.86) is only slightly lower than the expected profit per buyer on the training set (1227.71). Thus our model was able to generalize from the training set.</p>
+<p>The expected profit per buyer on the test set (1256.42) is only slightly lower than the expected profit per buyer on the training set (1294.33). Thus our model was able to generalize from the training set.</p>
 </section>
 <section id="evaluating-model-fairness" class="level1">
 <h1>Evaluating Model Fairness</h1>
 <p>Lets explore if some loaners are more or less likely to receive loans based on their age</p>
-<div id="cell-30" class="cell">
+<div id="cell-32" class="cell" data-execution_count="72">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remake age groups in 10 year gaps and calculate the difference in default prediction vs reality</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"age_group"</span>] <span class="op">=</span> df_test[<span class="st">"person_age"</span>] <span class="op">//</span> <span class="dv">10</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"diff"</span>] <span class="op">=</span> df_test[<span class="st">"y_pred"</span>] <span class="op">-</span> df_test[<span class="st">"loan_status"</span>]</span>
@@ -745,7 +749,7 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Display this data as a table</span></span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>temp <span class="op">=</span> df_test.groupby(<span class="st">"age_group"</span>)[[<span class="st">"loan_status"</span>, <span class="st">"y_pred"</span>, <span class="st">"diff"</span>]].mean().reset_index()</span>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>temp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="31">
+<div class="cell-output cell-output-display" data-execution_count="72">
 <div>
 
 
@@ -764,29 +768,29 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 <td data-quarto-table-cell-role="th">0</td>
 <td>2</td>
 <td>0.228689</td>
-<td>0.163246</td>
-<td>-0.065443</td>
+<td>0.198744</td>
+<td>-0.029944</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>3</td>
 <td>0.204082</td>
-<td>0.136578</td>
-<td>-0.067504</td>
+<td>0.184458</td>
+<td>-0.019623</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>4</td>
 <td>0.200000</td>
-<td>0.138462</td>
-<td>-0.061538</td>
+<td>0.153846</td>
+<td>-0.046154</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>5</td>
 <td>0.261905</td>
-<td>0.119048</td>
-<td>-0.142857</td>
+<td>0.142857</td>
+<td>-0.119048</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
@@ -799,8 +803,8 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 <td data-quarto-table-cell-role="th">5</td>
 <td>7</td>
 <td>0.500000</td>
-<td>0.500000</td>
 <td>0.000000</td>
+<td>-0.500000</td>
 </tr>
 </tbody>
 </table>
@@ -808,8 +812,8 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 </div>
 </div>
 </div>
-<p>In almost all age groups (age group 7 only has two individuals) the algorithm underpredicts the loan default rate. However, two age groups which are far less likely to get a loan than other groups (excluding group 7), are age group 20-29 and 60-69. Despite, the algorithim underpredicting the default rate in this age group, especially in the 60-69 age group, these groups are still predicted to be much more likely to defualt than the other age groups. Lets now look at the difficulty of getting loans based on loan intent.</p>
-<div id="cell-32" class="cell" data-execution_count="58">
+<p>In almost all age groups (age group 7 only has two individuals) the algorithm underpredicts the loan default rate. However, two age groups which are less likely to get a loan than other groups (excluding group 7), are age group 20-29 and 30-39. Despite, the algorithim underpredicting the default rate in this age group these groups are still predicted to be much more likely to defualt than the other age groups. The algorithm also seems to underpredict default rates more as loaners grow older. Lets now look at the difficulty of getting loans based on loan intent.</p>
+<div id="cell-34" class="cell" data-execution_count="73">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>temp2 <span class="op">=</span> df_test.copy()</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Melt the data so it can be plotted in a</span></span>
@@ -824,8 +828,8 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 </div>
 </div>
 </div>
-<p>Medical loans have the highest predicted default rate making them the hardes loans to get, however medical loans do have the second highest default rate. Education, Personal, and Debt Consolidation are the next hardest loans to get. Venture loans are predicted to default less often than the previous, and Home Improvement loans are predicted to default the least, despite having the third highest actual default rate. In all cases, the default rate was predicted to be less than than it ended up being. Now, lets examine how gross income affects the ease with which credit can be obtained.</p>
-<div id="cell-34" class="cell" data-execution_count="60">
+<p>Medical, Debt Consolidation, and Personal loans have the highest predicted default rate making them the hardes loans to get; however both Medical and Debt Consolidation loans do have the highest actual default rate. Education and Venture are the next hardest loans to get. Interestingly, both Venture and Education loans are preidcted to default more than they actually do and are the only loan type to display this behavior. Home Improvement loans are predicted to default the least, despite having the third highest actual default rate. Now, lets examine how gross income affects the ease with which credit can be obtained.</p>
+<div id="cell-36" class="cell" data-execution_count="75">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>temp3 <span class="op">=</span> df_test.copy()</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Group income into categories separated by $25,000 in income</span></span>
@@ -845,6 +849,12 @@ Cross validation for the selected predictors: [0.81461287 0.81352236 0.81222707 
 </div>
 </div>
 <p>In this model, lower income is strongly associated with greater likelihood to default, making it much harder get loans at low income. While lower income is generally associated with higher default rates, it is unrealistic that the model predicts loaners making more than 75,000 to pay back their loans 100% of the time. In fact, the second highest default rate is actually in the 200,000 - 224,999 income category.</p>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>Our analysis revealed that income stability, credit history, and collateral availability are the most significant determinants in securing a loan. Borrowers with lower credit scores or irregular income streams often struggle to obtain loans or face significantly higher interest rates. While banks aim to mitigate risks through stringent approval processes, these measures inadvertently create barriers for individuals in need, particularly those seeking medical loans or small business financing.</p>
+<p>Individuals seeking loans for medical expenses often face greater difficulties in obtaining credit due to the high default rates associated with medical debt. From a financial standpoint, banks perceive these loans as high-risk due to the uncertainty surrounding medical outcomes and the borrower’s ability to repay. However, this raises ethical concerns regarding fairness in credit access. Fairness, in this context, can be defined as the equitable opportunity for all individuals to obtain financial assistance without undue discrimination or excessive barriers.</p>
+<p>Given that medical expenses are often urgent and unavoidable, it is arguably unjust that those in dire need of healthcare financing encounter significant hurdles. A fairer approach could involve government-backed loan programs, flexible repayment structures, or the integration of medical hardship considerations into lending criteria. By reassessing how medical loans are evaluated, financial institutions can contribute to a system that balances risk management with social responsibility.</p>
 
 
 </section>
