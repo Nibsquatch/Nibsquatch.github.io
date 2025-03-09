@@ -411,7 +411,7 @@ dtype: int64</code></pre>
 </div>
 <p>While Culmen Depth vs Flipper Length provides the clearest specification for Gentoo Penguins, Adelie and Chinstrap become too muddled to properly distinguish. Culmen Length vs Flipper Length does a good job in making three clusters, with Chinstrap isolating the most, howeever there is still overlap in the regions of Gentoo and Adelie.</p>
 <p>Next we will define a method to properly give integer values to species as well as other categorical variables and apply this method to our data.</p>
-<div id="cell-12" class="cell" data-execution_count="4">
+<div id="cell-12" class="cell" data-execution_count="55">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize LabelEncoders for categorical variables</span></span>
@@ -432,7 +432,7 @@ dtype: int64</code></pre>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize our new training data</span></span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>df_train.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="55">
 <div>
 
 
