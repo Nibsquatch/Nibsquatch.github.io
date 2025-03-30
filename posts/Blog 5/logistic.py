@@ -117,7 +117,7 @@ class LogisticRegression(LinearModel):
     # returns the sigmoid of the score s
     def sig(self, s):
         epsilon = 1e-8
-        return 1 / (1 + torch.exp(-s))
+        return 1 / (1 + torch.exp(-s) + epsilon) 
 
     # calculates the logistic loss with the current weight vector w
     def loss(self, X, y):
