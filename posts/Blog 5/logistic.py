@@ -113,20 +113,17 @@ class PerceptronOptimizer:
             self.model.w += update  # Correct perceptron weight update
 
 class LogisticRegression(LinearModel):
-    
+
     # returns the sigmoid of the score s
     def sig(self, s):
-        epsilon = 1e-8
-        return 1 / (1 + torch.exp(-s) + epsilon) 
+        return 1 / (1 + torch.exp(-s))
 
     # calculates the logistic loss with the current weight vector w
     def loss(self, X, y):
-        # convert y from boolean to {0,1}
-        y = 1.0*y
-        
+
         s = self.score(X)  # Compute scores for all samples
         sig_s = self.sig(s)  # Apply sigmoid function
-
+        
         # Compute logistic loss
         loss = -y * torch.log(sig_s) - (1 - y) * torch.log(1 - sig_s)
 
@@ -149,6 +146,9 @@ class GradientDescentOptimizer():
 
     # computes one step of a Logistic Regression update using gradient descent
     def step(self, X, y, alpha, Beta):
+        
+        if self.model.w is None:
+            self.model.w = torch.randn(X.shape[1], requires_grad=False) * 0.01  # small random init
         
         # calculates the first step without the momentum term, as there was no previous weight vector
         if self.prev == None:
