@@ -92,7 +92,17 @@ class Perceptron(LinearModel):
             return y_i * X.squeeze(0)  # Ensure correct shape
     
         return torch.zeros_like(self.w)  # No update if correctly classified
-        
+    
+    def grad(self, X, y, alpha):
+
+        y_i = 2 * y - 1  # Convert {0,1} labels to {-1,1}
+
+        s_i = self.score(X)  # Compute score
+
+        if (s_i * y_i).item() <= 0:  # Misclassified point
+            return y_i * X.squeeze(0)  # Ensure correct shape
+    
+        return torch.zeros_like(self.w)  # No update if correctly classified
 
 class PerceptronOptimizer:
 

@@ -59,66 +59,30 @@ class LinearModel:
         s = self.score(X)
         return (s >= 0).float()
 
-class Perceptron(LinearModel):
-
-    def loss(self, X, y):
-        """
-        Compute the misclassification rate. A point i is classified correctly if it holds that s_i*y_i_ > 0, where y_i_ is the *modified label* that has values in {-1, 1} (rather than {0, 1}). 
-
-        ARGUMENTS: 
-            X, torch.Tensor: the feature matrix. X.size() == (n, p), 
-            where n is the number of data points and p is the 
-            number of features. This implementation always assumes 
-            that the final column of X is a constant column of 1s. 
-
-            y, torch.Tensor: the target vector.  y.size() = (n,). The possible labels for y are {0, 1}
-        
-        HINT: In order to use the math formulas in the lecture, you are going to need to construct a modified set of targets and predictions that have entries in {-1, 1} -- otherwise none of the formulas will work right! An easy to to make this conversion is: 
-        
-        y_ = 2*y - 1
-        """
-
-        # return the proportion
-        return (1.0*((self.score(X) * (2 * y -1)) <= 0)).mean()
-
-
-    def grad(self, X, y):
-
-        y_i = 2 * y - 1  # Convert {0,1} labels to {-1,1}
-
-        s_i = self.score(X)  # Compute score
-
-        if (s_i * y_i).item() <= 0:  # Misclassified point
-            return y_i * X.squeeze(0)  # Ensure correct shape
-    
-        return torch.zeros_like(self.w)  # No update if correctly classified
-        
-
-class PerceptronOptimizer:
-
-    def __init__(self, model):
-        self.model = model 
-    
-    def step(self, X, y):
-        """
-        Compute one step of the perceptron update using the feature matrix X 
-        and target vector y. 
-        """
-
-        loss = self.model.loss(X, y)
-
-        update = self.model.grad(X, y)
-        
-        if update is not None:  # Ensure meaningful update
-            self.model.w += update  # Correct perceptron weight update
-
 class LogisticRegression(LinearModel):
 
-    # returns the sigmoid of the score s
+    """
+    Computes the sigmoid of the input score.
+
+    Args:
+        s (Tensor): A PyTorch tensor containing the input scores.
+
+    Returns:
+        Tensor: The element-wise sigmoid of the input tensor.
+    """
     def sig(self, s):
         return 1 / (1 + torch.exp(-s))
 
-    # calculates the logistic loss with the current weight vector w
+    """
+    Calculates the logistic loss using the current weight vector.
+
+    Args:
+        X (Tensor): A PyTorch tensor of input features with shape (n_samples, n_features).
+        y (Tensor): A PyTorch tensor of binary labels with shape (n_samples,).
+
+    Returns:
+        Tensor: The mean logistic loss across all samples.
+    """
     def loss(self, X, y):
 
         s = self.score(X)  # Compute scores for all samples
@@ -129,7 +93,18 @@ class LogisticRegression(LinearModel):
 
         return loss.mean()  # Return the average loss
     
-    # calculates the gradient of the empirical risk for logistic regression optimization
+    """
+    Calculates the gradient of the empirical risk (logistic loss) 
+    for use in logistic regression optimization.
+
+    Args:
+        X (Tensor): A PyTorch tensor of input features with shape (n_samples, n_features).
+        y (Tensor): A PyTorch tensor of binary labels with shape (n_samples,).
+
+    Returns:
+        Tensor: The average gradient of the logistic loss with respect to the weights, 
+        with shape (n_features,).
+    """
     def grad(self, X, y): 
         y = y.float()  # Ensure y is float
         s = self.score(X)  
@@ -144,9 +119,25 @@ class GradientDescentOptimizer():
         self.model = model 
         self.prev = None
 
-    # computes one step of a Logistic Regression update using gradient descent
+    """
+    Performs one step of logistic regression parameter update using 
+    gradient descent with optional momentum.
+
+    This method updates the model's weight vector based on the gradient 
+    of the logistic loss and optionally includes a momentum term for smoother convergence.
+
+    Args:
+        X (Tensor): A PyTorch tensor of input features with shape (n_samples, n_features).
+        y (Tensor): A PyTorch tensor of binary labels with shape (n_samples,).
+        alpha (float): The learning rate.
+        Beta (float): The momentum coefficient. When Beta > 0, a momentum term is included.
+
+    Returns:
+        None
+    """
     def step(self, X, y, alpha, Beta):
         
+        # handles the case where the weight vector w has not been specified
         if self.model.w is None:
             self.model.w = torch.randn(X.shape[1], requires_grad=False) * 0.01  # small random init
         
