@@ -81,43 +81,56 @@ class Perceptron(LinearModel):
         # return the proportion
         return (1.0*((self.score(X) * (2 * y -1)) <= 0)).mean()
 
+    """
+    Compute the gradient update for a mini-batch using the Perceptron rule.
 
-    def grad(self, X, y):
+    Args:
+        X_batch (Tensor): A batch of input features of shape (batch_size, d).
+        y_batch (Tensor): Corresponding labels of shape (batch_size,).
 
-        y_i = 2 * y - 1  # Convert {0,1} labels to {-1,1}
+    Returns:
+        Tensor: The average update vector of shape (d,).
+    """
+    def grad(self, X_batch, y_batch):
+        # Convert labels to {-1, 1}
+        y_mod = 2 * y_batch - 1
 
-        s_i = self.score(X)  # Compute score
+        # Compute raw scores
+        scores = self.score(X_batch)
 
-        if (s_i * y_i).item() <= 0:  # Misclassified point
-            return y_i * X.squeeze(0)  # Ensure correct shape
-    
-        return torch.zeros_like(self.w)  # No update if correctly classified
-    
-    def grad(self, X, y, alpha):
+        # Find where prediction is wrong: score * label <= 0
+        mask = (scores * y_mod) <= 0
+        
+        # Compute the perceptron updates for wrong examples and average them
+        if mask.sum() == 0: # no mismatches were found
+            return torch.zeros_like(self.w)  # No update needed
+        
+        else:
+            # Select misclassified examples
+            misclassified_X = X_batch[mask]
+            misclassified_y = y_mod[mask].unsqueeze(1)
 
-        y_i = 2 * y - 1  # Convert {0,1} labels to {-1,1}
+            # Compute updates
+            updates = misclassified_y * misclassified_X
+            averaged_update = updates.mean(dim=0)
 
-        s_i = self.score(X)  # Compute score
+            return averaged_update
 
-        if (s_i * y_i).item() <= 0:  # Misclassified point
-            return y_i * X.squeeze(0)  # Ensure correct shape
-    
-        return torch.zeros_like(self.w)  # No update if correctly classified
+        return averaged_update
 
 class PerceptronOptimizer:
 
     def __init__(self, model):
         self.model = model 
     
-    def step(self, X, y):
+    def step(self, X, y, alpha):
+        
         """
         Compute one step of the perceptron update using the feature matrix X 
         and target vector y. 
         """
 
-        loss = self.model.loss(X, y)
-
-        update = self.model.grad(X, y)
+        update = (alpha / len(X)) * self.model.grad(X, y)
         
         if update is not None:  # Ensure meaningful update
             self.model.w += update  # Correct perceptron weight update
