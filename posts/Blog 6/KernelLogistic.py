@@ -78,7 +78,7 @@ class KernelLogisticRegression():
         """
         # your implementation here
         s = self.score(X)
-        return (s >= .5).float()
+        return (s >= 0).float()
     
         
     def loss(self, X, y):
