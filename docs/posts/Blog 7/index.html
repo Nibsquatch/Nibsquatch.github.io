@@ -8,7 +8,7 @@
 
 <meta name="author" content="Ryan Mauney">
 <meta name="dcterms.date" content="2024-04-29">
-<meta name="description" content="In this post we explore how Overparameterizatione can actually imrove accuracy instead of leading to overfitting, especially in the context corruption detection.">
+<meta name="description" content="In this post we explore how Overparameterization can actually improve accuracy instead of leading to overfitting, especially in the context corruption detection.">
 
 <title>Blog 7 - Exploring Overfitting as a Result of Overparameterization and Double Descent – My Awesome CSCI 0451 Blog</title>
 <style>
@@ -200,7 +200,7 @@ window.Quarto = {
       <h1 class="title">Blog 7 - Exploring Overfitting as a Result of Overparameterization and Double Descent</h1>
                   <div>
         <div class="description">
-          In this post we explore how Overparameterizatione can actually imrove accuracy instead of leading to overfitting, especially in the context corruption detection.
+          In this post we explore how Overparameterization can actually improve accuracy instead of leading to overfitting, especially in the context corruption detection.
         </div>
       </div>
                 </div>
@@ -249,7 +249,7 @@ window.Quarto = {
 <section id="loading-the-model-and-packages" class="level1">
 <h1>Loading the Model and Packages</h1>
 <p>Source Code: https://raw.githubusercontent.com/Nibsquatch/Nibsquatch.github.io/refs/heads/main/OverparametrizedRegression.py</p>
-<div id="cell-7" class="cell" data-execution_count="1">
+<div id="cell-7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>load_ext autoreload</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>autoreload <span class="dv">2</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
@@ -264,7 +264,7 @@ window.Quarto = {
 </section>
 <section id="testing-model-on-simple-data" class="level1">
 <h1>Testing Model on Simple Data</h1>
-<div id="cell-9" class="cell" data-execution_count="2">
+<div id="cell-9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First we will define a class to generate random feature maps</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sig(x): </span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>torch.exp(<span class="op">-</span>x))</span>
@@ -301,7 +301,7 @@ window.Quarto = {
 <span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.activation(X <span class="op">@</span> <span class="va">self</span>.u <span class="op">+</span> <span class="va">self</span>.b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To test our model we will fit nonlinear data using our random features class and feed these features to our LinearRegression model. We will then plot our predictions overtop the data.</p>
-<div id="cell-11" class="cell" data-execution_count="3">
+<div id="cell-11" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate Nonlinear Data</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> torch.tensor(np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">100</span>).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), dtype <span class="op">=</span> torch.float64)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> X<span class="op">**</span><span class="dv">4</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>X <span class="op">+</span> torch.normal(<span class="dv">0</span>, <span class="dv">5</span>, size<span class="op">=</span>X.shape)</span>
@@ -343,7 +343,7 @@ window.Quarto = {
 <section id="double-descent-in-image-corruption-detection" class="level1">
 <h1>Double Descent in Image Corruption Detection</h1>
 <p>To perform image corruption detections we will load a greyscale image of a flower and then replace some of the pixels with completely grey chunks to represent corruption of the image. We will then attempt to use our model to predict the number of corruptions in the image based on the image itself. Lets start by loading the image and corrupting it.</p>
-<div id="cell-15" class="cell" data-execution_count="4">
+<div id="cell-15" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load our flower image</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_sample_images()     </span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> dataset.images[<span class="dv">1</span>]</span>
@@ -406,7 +406,7 @@ window.Quarto = {
 </div>
 </div>
 <p>Now that we have a method to generate corrupted flowers with varying levels of corruption, we will generate a dataset of 200 samples of corrupted images and split into testing and training data.</p>
-<div id="cell-17" class="cell" data-execution_count="5">
+<div id="cell-17" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set 200 samples as our benchmark dataset size</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="dv">200</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -423,7 +423,7 @@ window.Quarto = {
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size <span class="op">=</span> <span class="fl">0.5</span>, random_state <span class="op">=</span> <span class="dv">42</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Time to train on our model on our corrupt image dataset. As a baseline, lets see how a standard linear model would perform before overparameterization. We will then iterate through varying levels of overparametrization and keep track of the MSE for both training and testing. For our feature extension we will also used a squared activation instead of a sigmoid activation.</p>
-<div id="cell-19" class="cell">
+<div id="cell-19" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize arrays to keep track of MSE and number of features</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>MSE_training, MSE_testing <span class="op">=</span> [], []</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>num_features <span class="op">=</span> []</span>
@@ -453,9 +453,28 @@ window.Quarto = {
 <span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    MSE_training.append(LR.loss(phi_X_train, y_train))</span>
 <span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    MSE_testing.append(LR.loss(phi_X_test, y_test))</span>
 <span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    num_features.append(<span class="bu">len</span>(LR.w))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg ansi-bold">KeyboardInterrupt</span>                         Traceback (most recent call last)
+Cell <span class="ansi-green-fg ansi-bold">In[8], line 17</span>
+<span class="ansi-green-fg">     14</span> phi<span style="color:rgb(98,98,98)">.</span>fit(X_train)
+<span class="ansi-green-fg">     15</span> phi_X_train <span style="color:rgb(98,98,98)">=</span> phi<span style="color:rgb(98,98,98)">.</span>transform(X_train)
+<span class="ansi-green-fg ansi-bold">---&gt; 17</span> <span class="ansi-yellow-bg">phi</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">fit</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">X_test</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg">     18</span> phi_X_test <span style="color:rgb(98,98,98)">=</span> phi<span style="color:rgb(98,98,98)">.</span>transform(X_test)
+<span class="ansi-green-fg">     20</span> <span style="font-style:italic;color:rgb(95,135,135)"># instantiate and fit a linear regression model with an optimizer</span>
+
+Cell <span class="ansi-green-fg ansi-bold">In[4], line 30</span>, in <span class="ansi-cyan-fg">RandomFeatures.fit</span><span class="ansi-blue-fg ansi-bold">(self, X)</span>
+<span class="ansi-green-fg">     29</span> <span style="font-weight:bold;color:rgb(0,135,0)">def</span> <span style="color:rgb(0,0,255)">fit</span>(<span style="color:rgb(0,135,0)">self</span>, X):
+<span class="ansi-green-fg ansi-bold">---&gt; 30</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>u <span style="color:rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">torch</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">randn</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">X</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">size</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">[</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">1</span><span class="ansi-yellow-bg">]</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">n_features</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">dtype</span><span class="ansi-yellow-bg"> </span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">torch</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">float64</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg">     31</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>b <span style="color:rgb(98,98,98)">=</span> torch<span style="color:rgb(98,98,98)">.</span>rand((<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>n_features), dtype <span style="color:rgb(98,98,98)">=</span> torch<span style="color:rgb(98,98,98)">.</span>float64)
+
+<span class="ansi-red-fg ansi-bold">KeyboardInterrupt</span>: </pre>
+</div>
+</div>
 </div>
 <p>Lets visualize how our training and testing MSE are changing as a result of increasing the number of features.</p>
-<div id="cell-21" class="cell" data-execution_count="32">
+<div id="cell-21" class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create plots</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize <span class="op">=</span> (<span class="dv">12</span>, <span class="dv">5</span>))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -484,14 +503,24 @@ window.Quarto = {
 </div>
 </div>
 <p>The vertical black lines represent the iterpolation point, or the point where the number of features is equivalent to the number of samples. This is a typical marker for double descent, where as the number of features becomes greater than the number of samples the loss will begin to go back down. Our data demonstrates that this is clearly the case for image classification as the MSE increase dramatically until the interpolation threshold and then begins to gradually decrease; the MSE for the training data has seeminly high variance but because of the log scale it actually demonstrates effectively no loss. If we had more computing power available we could attempt to extend this model to 10,000 features as it seems as if the MSE for the testing data is still following a negative trend even around 1000 features.</p>
-<div id="cell-23" class="cell" data-execution_count="39">
+<div id="cell-23" class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># print the best number of features to produce the minimum MSE in the testing data</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>min_MSE <span class="op">=</span> <span class="bu">min</span>(MSE_testing)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>min_features <span class="op">=</span> num_features[MSE_testing.index(min_MSE)]</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"The smallest testing MSE achieved was "</span> <span class="op">+</span> <span class="bu">str</span>(min_MSE.item()) <span class="op">+</span> <span class="st">" which occured with "</span> <span class="op">+</span> <span class="bu">str</span>(min_features) <span class="op">+</span> <span class="st">" features which occurs far beyond the interpolation point."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>The smallest testing MSE achieved was 917.8932718554004 which occured with 608 features which occurs far beyond the interpolation point.</code></pre>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg ansi-bold">NameError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg ansi-bold">In[2], line 2</span>
+<span class="ansi-green-fg">      1</span> <span style="font-style:italic;color:rgb(95,135,135)"># print the best number of features to produce the minimum MSE in the testing data</span>
+<span class="ansi-green-fg ansi-bold">----&gt; 2</span> min_MSE <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">min</span>(<span class="ansi-yellow-bg">MSE_testing</span>)
+<span class="ansi-green-fg">      3</span> min_features <span style="color:rgb(98,98,98)">=</span> num_features[MSE_testing<span style="color:rgb(98,98,98)">.</span>index(min_MSE)]
+<span class="ansi-green-fg">      5</span> <span style="color:rgb(0,135,0)">print</span>(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">The smallest testing MSE achieved was </span><span style="color:rgb(175,0,0)">"</span> <span style="color:rgb(98,98,98)">+</span> <span style="color:rgb(0,135,0)">str</span>(min_MSE<span style="color:rgb(98,98,98)">.</span>item()) <span style="color:rgb(98,98,98)">+</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)"> which occured with </span><span style="color:rgb(175,0,0)">"</span> <span style="color:rgb(98,98,98)">+</span> <span style="color:rgb(0,135,0)">str</span>(min_features) <span style="color:rgb(98,98,98)">+</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)"> features which occurs far beyond the interpolation point.</span><span style="color:rgb(175,0,0)">"</span>)
+
+<span class="ansi-red-fg ansi-bold">NameError</span>: name 'MSE_testing' is not defined</pre>
+</div>
 </div>
 </div>
 </section>
