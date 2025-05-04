@@ -75,6 +75,10 @@ class MyLinearRegression(LinearModel):
             float (tensor): Mean Squared Error
         """
         y_pred = self.predict(X)
+        # Ensure both are 1D for fair comparison
+        y_pred = y_pred.squeeze()
+        y = y.squeeze()
+        
         mse = torch.mean((y_pred - y) ** 2)
         return mse
     
