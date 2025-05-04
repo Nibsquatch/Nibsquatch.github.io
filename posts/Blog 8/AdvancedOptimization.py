@@ -95,7 +95,7 @@ class LogisticRegression(LinearModel):
         D = sig * (1 - sig)  
         weighted_X = X * D.unsqueeze(1)
         H = X.T @ weighted_X
-        return H
+        return H + 1e-6 # add a very small term on the end to prevent singular matrices from breaking the hessian
 
 
 class NewtonOptimizer():
@@ -120,7 +120,7 @@ class NewtonOptimizer():
         else:
             # Compute gradient and inverse Hessian
             grad = self.model.grad(X, y)
-            H_inv = torch.linalg.inv(self.model.hessian(X))
+            H_inv = torch.linalg.pinv(self.model.hessian(X)) # we use the pseudoinverse for better stability
 
             # Newton update step
             self.model.w = self.model.w - alpha * (H_inv @ grad)
