@@ -6,10 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Ryan Mauney">
-<meta name="dcterms.date" content="2024-05-05">
+<meta name="author" content="Carly McAdam, Chloe Katz, Ryan Mauney">
+<meta name="dcterms.date" content="2025-05-19">
+<meta name="description" content="CSCI 0451 final project">
 
-<title>Blog 8 - Exploring Advanced Optimization Using Newton’s Method and Adam – My Awesome CSCI 0451 Blog</title>
+<title>Final Project - Predicting MLB Pitch Calls – My Awesome CSCI 0451 Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -56,7 +57,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -167,8 +188,13 @@ background-size: cover;
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Blog 8 - Exploring Advanced Optimization Using Newton’s Method and Adam</h1>
-                      </div>
+      <h1 class="title">Final Project - Predicting MLB Pitch Calls</h1>
+                  <div>
+        <div class="description">
+          CSCI 0451 final project
+        </div>
+      </div>
+                </div>
   </div>
     
   
@@ -177,14 +203,14 @@ background-size: cover;
       <div>
       <div class="quarto-title-meta-heading">Author</div>
       <div class="quarto-title-meta-contents">
-               <p>Ryan Mauney </p>
+               <p>Carly McAdam, Chloe Katz, Ryan Mauney </p>
             </div>
     </div>
       
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">May 5, 2024</p>
+        <p class="date">May 19, 2025</p>
       </div>
     </div>
     
@@ -203,161 +229,266 @@ background-size: cover;
 
 
 
-<section id="abstract" class="level1">
-<h1>Abstract</h1>
+<section id="abstract" class="level3">
+<h3 class="anchored" data-anchor-id="abstract">Abstract</h3>
+<p>In our project, we sought to predict whether umpires will call a pitch correctly or not. We used features of the pitch like its velocity and release position and features of the game situation like number of runners on base, pitch count, and inning to train a logistic regression model. We chose these features because we wanted to look for patterns in pitch calls that weren’t related to where the pitch ended up over the plate. We fit a logistic regression model both from Scikit-learn as well as our own model leveraging Newton based optimization, and founrd that the Scikit-Learn model achieved higher overall accuracy compared to the Custom Newton model, which, despite exhibiting more stable convergence and better generalizability to pitch types and batter handedness, struggled with false convergence and umpire call prediction errors. With additional computational resources, the Newton model may overcome its convergence limitations and improve prediction accuracy.</p>
+<p><a href="https://github.com/ctkatz/ML_project">Find the source code here</a></p>
 </section>
-<section id="loading-the-model-and-packages" class="level1">
-<h1>Loading the Model and Packages</h1>
-<p>Source Code:</p>
-<div id="cell-4" class="cell" data-execution_count="80">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>load_ext autoreload</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>autoreload <span class="dv">2</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> kagglehub</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kagglehub <span class="im">import</span> KaggleDatasetAdapter</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> AdvancedOptimization <span class="im">import</span> LogisticRegression, NewtonOptimizer, GradientDescentOptimizer</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">'seaborn-v0_8-whitegrid'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="introduction" class="level3">
+<h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
+<p>The problem that we want to address in the project is improving fairness in baseball. We want to see if we can detect patterns in incorrect calls to highlight bias towards or against certain player demographics, game situations, or pitch types. This information could help teams understand when pitchers need to be more precise with their pitch locations and help umpires focus on calling pitches extra carefully during situations when they have been found to be less consistent. We hypothesize that there may be other factors impacting an umpires’ decision to call a strike besides just the location of the pitch when it arrives over the plate.</p>
+<p>Statistics are an essential part of modern day baseball, and all MLB teams have extensive infrastructure in data analytics. Furthermore, because the MLB statistics are publicly available, there are many people using statistical and machine learning methods to make predictions about baseball pitches. Specifically, there has been a lot of work in using classification methods to predict pitch types. Glenn Sidle and Hien Tran, for example, used different multi-class classification methods to predict pitch types (<span class="citation" data-cites="predictpitchtypes">Sidle and Tran (<a href="#ref-predictpitchtypes" role="doc-biblioref">2017</a>)</span>). They used post-processing techniques, like ranking the permuted variable delta error of each feature that was calculated in the construction of their random forest, to investigate the importance of each of the features they used. They found pitch count and batter handedness to be some of the most important features. Even though they were asking a different question than we are, it was still useful to see which features impact the pitch type the most, because these features could also impact the umpire calling the pitch. Or, if if pitch type impacts call correctness, these features would also be important. Additionally, they used categorical features like number of outs, inning, score, and time of day in their model, which helped us figure out how we might also want to use features like these in our model.</p>
+<p>In another paper that we looked at, Jasmine Barbee was predicting the final pitch outcome for an at-bat (<span class="citation" data-cites="predictfinaloutcome">Barbee (<a href="#ref-predictfinaloutcome" role="doc-biblioref">2020</a>)</span>). That is, whether the last pitch of the at bat was a strike (strikeout), a ball (walk), put in play but an out, or a hit. Barbee did some exploration into features like pitch speed and she was able to predict with reasonable accuracy the outcome of the final pitch using the pitch count, the horizontal and vertical pitch locations, and the start and end speeds of the pitch. Her process highlighted how these features can be used in conjunction with each other to learn information about a pitch without knowing its position over the plate. When we decided which features to use for our model, we used insights we had gained from other peoples’ work in classifying pitches.</p>
+<p>Futhermore, we also looked at some work that was aiming to answer a question similar to the one that we are. Etan Green and David Daniels at Stanford found that when the pitch count is 3-0 the strike zone expands, and when the pitch count is 0-2, the strike zone contracts (<span class="citation" data-cites="umpirebias">Green and Daniels (<a href="#ref-umpirebias" role="doc-biblioref">2014</a>)</span>). We found these results to support our hypothesis that umpires might not call strikes based soley on the location of the pitch, there may be other factors at play. This paper also prompted us to include the pitch count as a feature in our model. We found that most of these papers, even if they didn’t have the exact same research question that we did, mentioned similar motivations in their work that we have: making the game more fair and helping teams optimize their pitching capabilities to put them in a better position in a game.</p>
+</section>
+<section id="values-statement" class="level3">
+<h3 class="anchored" data-anchor-id="values-statement">Values Statement</h3>
+<p>This project would potentially be used by MLB teams and umpires. These teams are probably interested in understanding patterns in when pitches are likely to be called incorrectly, and umpires might be interesting in improving their call accuracy with this technology. [include something about potential results of looking for racial bias maybe].</p>
+<p>This model could help improve baseball by potentially helping umpires learn patterns in when they are calling pitches incorrectly and improving accuracy. It could benefit players and teams because they could gain a better understanding of situations when pitches are less likely to be called correctly. If they’re aware of these situations, they can try to avoid them.</p>
+<p>But, the ability for a model to find these patterns could potentially take away jobs from umpires in the long run. Automatic ball strike systems (electronic systems that use the ball position to call pitches instead of umpires) are already being used in minor league baseball. If technology is able to detect that umpires call pitches incorrectly with regularity, this may support the argument to replace home plate umpires with machines.</p>
+<p>Personally, all of our group members are big baseball fans. One of our favorite things about the game is how important statistics have become in baseball and how much analytical work is done to improve teams’ performances. We were all really excited about the opportunity to work with baseball statistics and we think that this technology could, in theory, make baseball more equitable. Even though this work isn’t necessarily improving the world as a whole, a lot of people care about baseball and making the game more fair might improve teams and fans’ experiences with the game.</p>
+</section>
+<section id="materials-and-methods" class="level3">
+<h3 class="anchored" data-anchor-id="materials-and-methods">Materials and Methods</h3>
+<section id="our-data" class="level4">
+<h4 class="anchored" data-anchor-id="our-data">Our Data</h4>
+<p>The data used in this project comes from Major League Baseball (MLB) pitch tracking data, which records information about pitches thrown during games. The data was collected from publicly available sources, specifically MLB’s official pitch tracking systems and data repositories. Each row in the dataset represents a single pitch thrown by a pitcher, including features such as pitch type, velocity, location, the batter’s handedness (left or right), the umpire’s call (strike or ball), and whether the call was correct. The data also includes metadata about the game, the batter, and the pitcher. The dataset was downloaded from <a href="https://www.kaggle.com/datasets/amandaaapoor/2021regularseasonmlbpitches">Kaggle</a>, and was uploaded there by user Amandaaa Poor.</p>
+<p>We also scraped a dataset from the MLB statcast API that includes information about each player active during the 2021 season (see code below). This dataset included batter handedness, batter nationality, position, and other information about each batter in the pitches dataset. We merged with this dataset with the pitches dataset so that we would have information about the pitch and batter for each pitch in the dataset.</p>
+<p>The primary focus of the our analysis was to determine bias which affects whether the umpire will make the correct call on a pitch, with additional breakdowns by batter handedness (left vs.&nbsp;right) and call type (strikes vs balls). The data was processed to handle missing values, standardize features, and generate additional variables like whether a pitch was on the edge of the strike zone. One potential limitation of the data is its inherent bias due to how pitch tracking systems are calibrated in different ballparks, which may affect accuracy. Additionally, the data does not account for environmental variables (such as lighting conditions or weather) that may influence umpire decisions. Since only pitches that were not hit are included in the analysis, the model may not generalize well to situations where the batter makes contact.</p>
+<div id="cell-9" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code to pull data from the MLB API</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsapi</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_team_ids():</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    teams <span class="op">=</span> statsapi.get(<span class="st">'teams'</span>, {<span class="st">'sportId'</span>: <span class="dv">1</span>})[<span class="st">'teams'</span>]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [team[<span class="st">'id'</span>] <span class="cf">for</span> team <span class="kw">in</span> teams]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_players_from_team(team_id, season<span class="op">=</span><span class="st">'2021'</span>):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    roster <span class="op">=</span> statsapi.get(<span class="st">'team_roster'</span>, {<span class="st">'teamId'</span>: team_id, <span class="st">'season'</span>: season})</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> roster[<span class="st">'roster'</span>]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_player_info_flat(player_id):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    person <span class="op">=</span> statsapi.get(<span class="st">'person'</span>, {<span class="st">'personId'</span>: player_id})</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> person[<span class="st">'people'</span>][<span class="dv">0</span>]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">'id'</span>: info.get(<span class="st">'id'</span>),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">'fullName'</span>: info.get(<span class="st">'fullName'</span>),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">'birthDate'</span>: info.get(<span class="st">'birthDate'</span>),</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">'birthCountry'</span>: info.get(<span class="st">'birthCountry'</span>),</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">'height'</span>: info.get(<span class="st">'height'</span>),</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">'weight'</span>: info.get(<span class="st">'weight'</span>),</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="st">'primaryPosition'</span>: info.get(<span class="st">'primaryPosition'</span>, {}).get(<span class="st">'abbreviation'</span>),</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">'batSide'</span>: info.get(<span class="st">'batSide'</span>, {}).get(<span class="st">'code'</span>),</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="st">'pitchHand'</span>: info.get(<span class="st">'pitchHand'</span>, {}).get(<span class="st">'code'</span>),</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">'debutDate'</span>: info.get(<span class="st">'mlbDebutDate'</span>),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="st">'active'</span>: info.get(<span class="st">'active'</span>),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_all_players_df(season<span class="op">=</span><span class="st">'2021'</span>):</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    team_ids <span class="op">=</span> get_team_ids()</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    player_data <span class="op">=</span> []</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> team_id <span class="kw">in</span> team_ids:</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        players <span class="op">=</span> get_players_from_team(team_id, season)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> player <span class="kw">in</span> players:</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            player_id <span class="op">=</span> player[<span class="st">'person'</span>][<span class="st">'id'</span>]</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            info <span class="op">=</span> get_player_info_flat(player_id)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            player_data.append(info)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.DataFrame(player_data)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>df_players <span class="op">=</span> get_all_players_df()</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_players.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We joined our two dataframes so that we would have information for each pitch about the demographics of the batter that received each pitch in the pitches dataframe.</p>
+<div id="cell-11" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>players <span class="op">=</span> pd.read_csv(<span class="st">"mlb_players_2021.csv"</span>) <span class="co"># Our dataset</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>pitches <span class="op">=</span> pd.read_csv(<span class="st">"regseason.csv"</span>) <span class="co"># Dataset from Kaggle</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>players.rename(columns<span class="op">=</span>{<span class="st">"id"</span> : <span class="st">"batter"</span>,<span class="st">"fullName"</span> : <span class="st">"batter_fullName"</span> , <span class="st">"birthCountry"</span> : <span class="st">"batter_birthCountry"</span>}, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>full_df <span class="op">=</span> pd.merge(pitches, players[[<span class="st">"batter"</span>,<span class="st">"batter_fullName"</span>,<span class="st">"batSide"</span>, <span class="st">"batter_birthCountry"</span>]], on<span class="op">=</span><span class="st">"batter"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We added some features to the dataset and did some cleaning to make it easier for us to work with.</p>
+<div id="cell-13" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove the pitches that were fouled, in play, or swung at</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>not_hit <span class="op">=</span> [<span class="st">"called_strike"</span>, <span class="st">"ball"</span>]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pitches_not_hit <span class="op">=</span> full_df[full_df[<span class="st">'description'</span>].isin(not_hit)].copy()</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create features needed for our analysis</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>pitches_not_hit[<span class="st">"strike_zone"</span>] <span class="op">=</span> pitches_not_hit[<span class="st">"zone"</span>] <span class="op">&lt;=</span> <span class="dv">9</span> <span class="co"># Determine if the pitch was actually in the zone</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>pitches_not_hit[<span class="st">"called_correctly"</span>] <span class="op">=</span> (</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    ((pitches_not_hit[<span class="st">"zone"</span>] <span class="op">&lt;=</span> <span class="dv">9</span>) <span class="op">&amp;</span> (pitches_not_hit[<span class="st">"type"</span>] <span class="op">==</span> <span class="st">"S"</span>)) <span class="op">|</span> <span class="co"># Pitch is in the zone and is called a strike  </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    ((pitches_not_hit[<span class="st">"zone"</span>] <span class="op">&gt;</span> <span class="dv">9</span>) <span class="op">&amp;</span> (pitches_not_hit[<span class="st">"type"</span>] <span class="op">==</span> <span class="st">"B"</span>))    <span class="co"># Pitch is not in the zone and is called a ball</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>) </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>pitches_not_hit[<span class="st">"called_correctly"</span>] <span class="op">=</span> pitches_not_hit[<span class="st">"called_correctly"</span>].astype(<span class="bu">int</span>) <span class="co"># This will be are target variable -- whether the pitch was called "correctly"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>One of the limitations of our dataset was that there was a large class imbalance, there were significantly more pitches called correctly than called incorrectly, which isn’t necessarily a bad thing. It’s good to see that most of the pitches in the MLB are being called correctly, but this might be challenging for our analysis. We talk about how we handled this in the approach section.</p>
+<div id="cell-15" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-stdout">
-<pre><code>The autoreload extension is already loaded. To reload it, use:
-  %reload_ext autoreload</code></pre>
+<pre><code>Number of pitches called correctly: 357779</code></pre>
 </div>
 </div>
-</section>
-<section id="testing-basic-function-on-simple-data" class="level1">
-<h1>Testing Basic Function on Simple Data</h1>
-<p>Before we move on to advanced experiments with our Newton optimizer, we will first check that our new Logistic Regression class can converge on data that we know standard Logistic Regression can converge on. Looking back at Blog 5, we will use a small dataset to test the basic function of our Logistic Regression model using the exact function to generate our data as we did in Blog 5.</p>
-<div id="cell-7" class="cell" data-execution_count="81">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define a function to generate random data points</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> classification_data(n_points <span class="op">=</span> <span class="dv">300</span>, noise <span class="op">=</span> <span class="fl">0.2</span>, p_dims <span class="op">=</span> <span class="dv">2</span>):</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> torch.arange(n_points) <span class="op">&gt;=</span> <span class="bu">int</span>(n_points<span class="op">/</span><span class="dv">2</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> <span class="fl">1.0</span><span class="op">*</span>y</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> y[:, <span class="va">None</span>] <span class="op">+</span> torch.normal(<span class="fl">0.0</span>, noise, size <span class="op">=</span> (n_points,p_dims))</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> torch.cat((X, torch.ones((X.shape[<span class="dv">0</span>], <span class="dv">1</span>))), <span class="dv">1</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X, y</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># generate our test data and convert to float</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> classification_data()</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> torch.tensor(X, dtype <span class="op">=</span> torch.<span class="bu">float</span>), torch.tensor(y, dtype <span class="op">=</span> torch.<span class="bu">float</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>C:\Users\miceo\AppData\Local\Temp\ipykernel_29368\2062740850.py:13: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  X, y = torch.tensor(X, dtype = torch.float), torch.tensor(y, dtype = torch.float)</code></pre>
+<div id="cell-16" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of pitches called incorrectly:"</span>,<span class="bu">len</span>(pitches_not_hit[pitches_not_hit[<span class="st">"called_correctly"</span>] <span class="op">==</span> <span class="dv">0</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of pitches called incorrectly: 32509</code></pre>
 </div>
 </div>
-<div id="cell-8" class="cell" data-execution_count="82">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># instantiate our new Logisitic Regression model with a Newton Optimizer and compare it to the Gradient Descent Optimizer</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>LR1 <span class="op">=</span> LogisticRegression()</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>LR2 <span class="op">=</span> LogisticRegression()</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>opt1 <span class="op">=</span> GradientDescentOptimizer(LR1)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>opt2 <span class="op">=</span> NewtonOptimizer(LR2)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># for keeping track of loss values</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>loss1_vec <span class="op">=</span> []</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>loss2_vec <span class="op">=</span> []</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># keeps track of mean loss between the two algorithms</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>mean_loss <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># training loop to iterate through optimization steps</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> (mean_loss <span class="op">&gt;</span> <span class="dv">0</span>):</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Track loss values (convert tensors to scalars)</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    loss1_vec.append(LR1.loss(X, y))</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    loss2_vec.append(LR2.loss(X, y))</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Perform optimization step</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    opt1.step(X, y, alpha <span class="op">=</span> <span class="fl">0.1</span>, Beta <span class="op">=</span> <span class="dv">0</span>) <span class="co"># Beta = 0 to skip the momentum term</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    opt2.step(X, y, alpha <span class="op">=</span> <span class="fl">0.1</span>)</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    mean_loss <span class="op">=</span> (LR1.loss(X, y) <span class="op">+</span> LR2.loss(X, y)) <span class="op">/</span> <span class="dv">2</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot loss over iterations</span></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(loss1_vec) <span class="op">+</span> <span class="dv">1</span>), loss1_vec, color <span class="op">=</span> <span class="st">"blue"</span>, label <span class="op">=</span> <span class="st">"Standard"</span>)</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(loss2_vec) <span class="op">+</span> <span class="dv">1</span>), loss2_vec, color <span class="op">=</span> <span class="st">"red"</span>, label <span class="op">=</span> <span class="st">"Newton"</span>)</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>plt.semilogx()</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Number of gradient descent iterations"</span>)</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Loss (binary cross entropy)"</span>)</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We made some initial visualizations of the data to get an understanding of what we are looking for. The colored area is the strike zone. We are looking to predict when pitches that are in the strike zone are called balls or when pitches that aren’t in the strike zone are called strikes. The plot on the right shows us that these incorrectly called pitches are most likely to be near the edge of the strike zone, which makes sense; these pitches are the hardest to call!</p>
+<div id="cell-18" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>Code for plotting strike zones</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Just use 5000 pitches for clarity in the plot</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>subset <span class="op">=</span> pitches.head(<span class="dv">5000</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>inside_zones <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>outside_zones_subset <span class="op">=</span> <span class="bu">sorted</span>(subset[<span class="op">~</span>subset[<span class="st">"zone"</span>].isin(inside_zones)][<span class="st">"zone"</span>].unique())</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>rainbow_palette <span class="op">=</span> sns.color_palette(<span class="st">"turbo"</span>, n_colors<span class="op">=</span><span class="bu">len</span>(inside_zones))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>gray_palette_subset <span class="op">=</span> sns.light_palette(<span class="st">"gray"</span>, n_colors<span class="op">=</span><span class="bu">len</span>(outside_zones_subset), reverse<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>zone_colors_subset <span class="op">=</span> {zone: color <span class="cf">for</span> zone, color <span class="kw">in</span> <span class="bu">zip</span>(inside_zones, rainbow_palette)}</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>zone_colors_subset.update({zone: color <span class="cf">for</span> zone, color <span class="kw">in</span> <span class="bu">zip</span>(outside_zones_subset, gray_palette_subset)})</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Incorrect pitches</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>incorrect_pitches <span class="op">=</span> pitches_not_hit[pitches_not_hit[<span class="st">"called_correctly"</span>] <span class="op">==</span> <span class="dv">0</span>]</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>outside_zones_incorrect <span class="op">=</span> <span class="bu">sorted</span>(incorrect_pitches[<span class="op">~</span>incorrect_pitches[<span class="st">"zone"</span>].isin(inside_zones)][<span class="st">"zone"</span>].unique())</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>gray_palette_incorrect <span class="op">=</span> sns.light_palette(<span class="st">"gray"</span>, n_colors<span class="op">=</span><span class="bu">len</span>(outside_zones_incorrect), reverse<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>zone_colors_incorrect <span class="op">=</span> {zone: color <span class="cf">for</span> zone, color <span class="kw">in</span> <span class="bu">zip</span>(inside_zones, rainbow_palette)}</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>zone_colors_incorrect.update({zone: color <span class="cf">for</span> zone, color <span class="kw">in</span> <span class="bu">zip</span>(outside_zones_incorrect, gray_palette_incorrect)})</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Create side-by-side plots</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">6</span>), sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 1: All pitches</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>subset,</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"plate_x"</span>,</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"plate_z"</span>,</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">"zone"</span>,</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span>zone_colors_subset,</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>axes[<span class="dv">0</span>]</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlim(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>)</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylim(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"All Pitch Zone Locations"</span>)</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Plate X"</span>)</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Plate Z"</span>)</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 2: Incorrect pitches</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>incorrect_pitches,</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"plate_x"</span>,</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"plate_z"</span>,</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">"zone"</span>,</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span>zone_colors_incorrect,</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>axes[<span class="dv">1</span>]</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlim(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>)</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylim(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Incorrectly Called Pitch Zone Locations"</span>)</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"Plate X"</span>)</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">""</span>)</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>This is good as our test has demonstrated that our Newton Optimizer functions, and is able to converge on simple data in approximately the same number of iterations as our standard gradient descent (without the momentum term). Lets move on to more advanced tests of the Newtwon Optimizer.</p>
-</section>
-<section id="experiments-using-newtons-method-to-classify-breast-cancer" class="level1">
-<h1>Experiments: Using Newton’s Method to Classify Breast Cancer</h1>
-<p>Our fist experiment we will be to determine whether or not we can find the appropiate learning rate alpha in order for our Logistic Regression model to properly classify breast cancer in patients as either malignant or benign. We will be loading a dataset from kaggle.</p>
-<div id="cell-12" class="cell" data-execution_count="130">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the dataset</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> <span class="st">"Pumpkin_Seeds_Dataset.xlsx"</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_excel(path)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Class"</span>] <span class="op">=</span> df[<span class="st">"Class"</span>].replace({<span class="st">"Çerçevelik"</span>: <span class="dv">1</span>, <span class="st">"Ürgüp Sivrisi"</span>: <span class="dv">0</span>})</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># split into X and y</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> df.drop(<span class="st">"Class"</span>, axis <span class="op">=</span> <span class="dv">1</span>), df[<span class="st">"Class"</span>]</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to torch tensors (as float for X and y)</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> torch.tensor(X.values, dtype <span class="op">=</span> torch.float32), torch.tensor(y.values, dtype <span class="op">=</span> torch.float32)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>C:\Users\miceo\AppData\Local\Temp\ipykernel_29368\2679479813.py:5: FutureWarning: Downcasting behavior in `replace` is deprecated and will be removed in a future version. To retain the old behavior, explicitly call `result.infer_objects(copy=False)`. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
-  df["Class"] = df["Class"].replace({"Çerçevelik": 1, "Ürgüp Sivrisi": 0})</code></pre>
-</div>
-</div>
-<p>Now that we have have our dataset, lets try to fit a Logistic Model with a Newton Optimzer and see how well the data converves. We’ll start off with a standard learning rate of alpha = .1</p>
-<div id="cell-14" class="cell" data-execution_count="133">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># instantiate model and optimizer</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>LR <span class="op">=</span> LogisticRegression()</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>opt <span class="op">=</span> GradientDescentOptimizer(LR)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># iterable</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>iterations <span class="op">=</span> <span class="dv">1000</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># keep track of loss across iterations for plotting</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>loss_vec <span class="op">=</span> []</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># training loop</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(iterations):</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># keep track of loss</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    loss_vec.append(LR.loss(X, y))</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># perfomr the optimizations step</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    opt.step(X, y, alpha <span class="op">=</span> <span class="fl">.1</span>, Beta <span class="op">=</span> <span class="fl">.9</span>)</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot loss over iterations</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(loss_vec) <span class="op">+</span> <span class="dv">1</span>), loss_vec, color <span class="op">=</span> <span class="st">"red"</span>)</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>plt.semilogx()</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Number of gradient descent iterations"</span>)</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Loss (binary cross entropy)"</span>)</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="discussion" class="level1">
-<h1>Discussion</h1>
+<section id="our-approach" class="level4">
+<h4 class="anchored" data-anchor-id="our-approach">Our Approach</h4>
+<p>We thought about using features in a few different ways, as we began with two large datasets, one about the information of the specific pitch, which included its speed, release information and landing information. We also had a dataset with player information that we merged. We created our target variable: weather the umpires call (strike or ball) matched the physical location of the pitch (strike or ball). Subsequently, we had to subset our data by only pitches that were not hit. We also downsampled our data to even out the number of pitches called correctly and incorrectly.</p>
+<p>We started off by including all variables, but realized this made the model too good- there were combinations of features that would give the model an almost direct indication of the status of the target variable. For example, when the count was full, the pitch was a ball and the chance of the batting team scoring a run increased, the model learned that 100% of the time, that pitch was called correctly (the umpire also called it a ball). In order to deal with this, we limited the features to only the ones that didn’t give any indication as to where the pitch ended up.</p>
+<p>This made our model perform decently well, around 60-70% accuracy, but we quickly realized that the model was only accurate when predicting missed calls for pitches that were balls and and bad for pitches that were strikes.</p>
+<p>Thinking about this, we realized that there are a ton of pitches in our dataset that no matter the game situation or umpire bias wil be called correctly. These are pitches straight down the middle or pitches way outside of the zone. Realizing this, we subset out data to only include pitches within two inches on either side of the strike zone. This narrows down our analysis to only pitches that umpires might call wrong with a higher probability.</p>
+<p>Our analysis focused on evaluating the accuracy of umpire calls using two logistic regression models: a standard Scikit-Learn Logistic Regression model and a Custom Logistic Regression with Newton’s Method. The primary features used as predictors included key pitch characteristics such as type, velocity, and horizontal and vertical position at the plate, along with batter attributes like handedness (left or right), and game context including pitch count, inning, and game situation; importantly, in the first iterations of the models information surrounding where the pitch ended up around the plate was excluded and was later added back in for pitches close to the edge of the strike zone. The target variable for prediction was whether the umpire’s call was correct, represented as a binary outcome (correct or incorrect).</p>
+<p>Both models were trained separately, with the Scikit-Learn model serving as a baseline comparison and the custom Newton-based model leveraging second-order optimization for potentially faster and more efficient parameter updates. Model evaluation was conducted using key metrics such as Accuracy, False Positive Rate (FPR), and False Negative Rate (FNR). Additionally, confusion matrices were generated for visual inspection of model performance across subgroups, and the predictions were benchmarked against actual umpire accuracy to identify significant deviations or biases in decision-making.</p>
+</section>
+</section>
+<section id="results" class="level3">
+<h3 class="anchored" data-anchor-id="results">Results</h3>
+<p>The Scikit-Learn model showed a higher overall accuracy compared to the Custom Newton model. However, the Custom Newton model exhibited more stable convergence during training and demonstrated competitive performance in edge cases near the strike zone. The Scikit-Learn model struggled with overfitting to specific pitch types, particularly balls however the Newton struggled to converge on the data. Perhaps with more computing to run many more iterations of our Newton descent it could have converged; the Newton did however demonstrated much better generalizability to both balls and strikes as well as left vs right handed batters. Confusion matrices were generated for left-handed and right-handed batters, revealing that both models performed better for right-handed batters, with fewer false positives and a clearer decision boundary compared to left batters.</p>
+<p>Confusion matrices were generated for left-handed and right-handed batters, highlighting key differences in model performance. Both models demonstrated improved accuracy for right-handed batters, with fewer false positives and a clearer decision boundary. This may suggest that the models are better calibrated for right-handed batting patterns or that there is an inherent bias in pitch tracking systems that favors right-handed batters. Conversely, left-handed batters experienced slightly higher error rates, particularly around borderline pitch locations. This discrepancy underlines the need for model adjustments to account for variability introduced by left-handed batting stances.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-4-image.png" class="img-fluid figure-img"></p>
+<figcaption>image.png</figcaption>
+</figure>
+</div>
+<p>Interestingly, the Custom Newton model consistently predicted umpires to always make the incorrect call for both handedness groups and for balls versus strikes. While this resulted in more balanced predictive power across these categories, it did not necessarily translate into higher accuracy. Given more computational resources, it is plausible that additional iterations of the Newton descent could have achieved better convergence and accuracy and removed this trend.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-1-image-2.png" class="img-fluid figure-img"></p>
+<figcaption>image-2.png</figcaption>
+</figure>
+</div>
+<p>Further analysis focused on balls and strikes separately, revealing distinct behavioral patterns for each model. The Scikit-Learn model generally showed stronger stability across a broader range of pitch types and batter handedness. Its higher False Positive Rate (FPR) and False Negative Rate (FNR) scores were indicative of more conservative decision-making, particularly for borderline calls. This conservatism led to highly consistent identification of balls but resulted in nearly always missing whether or not the umpire made the correct call for strikes.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-3-image-4.png" class="img-fluid figure-img"></p>
+<figcaption>image-4.png</figcaption>
+</figure>
+</div>
+<p>On the other hand, the Custom Newton model demonstrated slightly higher sensitivity when classifying strikes. This is likely due to the error in how the Newton model was predicting umpire calls. This error lead to increased false positives and much of the predictive power from the Newton model should be disregarded, espeically due to false convergence.</p>
+<p>The inability of the Custom Newton model to fully converge may be attributed to a combination of factors: dataset size, limited computational power, or an absence of clear patterns within the data. With further optimization and computational resources, Newton-based optimization could potentially achieve more accurate predictions, especially for classifications whithin specific regions such as handedness and edge-zone strikes.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-2-image-3.png" class="img-fluid figure-img"></p>
+<figcaption>image-3.png</figcaption>
+</figure>
+</div>
+</section>
+<section id="concluding-discussion" class="level3">
+<h3 class="anchored" data-anchor-id="concluding-discussion">Concluding Discussion</h3>
+<p>Our project was successful in that we were able to use a model that worked to predict our target variable. Specifically, we were able to predict with reasonable accuracy whether a ball would be called incorrectly. But, we also had some failures in our project, like the failure of our custom model to converge. We found some interesting results in our audit for bias, for example differences in model accuracy between right- and left-handed batters. We felt that we met the goals that we set at the beginning of the project. We were successful in creating a model and finding some interesting results. Compared some of the other work in this area, we found results along the lines of what we expected. The features that we found to be most important aligned with some of the papers that we read in preparation for the project, like pitch count. We didn’t see anyone look at model performance across batter-handedness, so this was a particularly interesting result. If we had more time to work on the project, we would have two main priorities. First, we’d want to further investigate the discrepancy between model performance for balls and strikes. We discussed a few hypotheses about why we thought this difference occurred, but we’d want to further investigate the features we are using in our model to see if any of them were overly correlated to our target variable or where the pitch ended up relative to the strike zone over the plate. We would also want to continue working with our custom model to see if we could get it to converge. Although the issues with convergence could be attributed to lack of patterns in the data, with more tuning of parameters and the features we train our model on, we may have been able to see a better performance from the model.</p>
+</section>
+<section id="group-contributions-statement" class="level3">
+<h3 class="anchored" data-anchor-id="group-contributions-statement">Group Contributions Statement</h3>
+<p>Our group spent a lot of time working in person together on the project, so we all contributed to each part of the source code. But, in general, each person contributed the most to the file with their name on it. Carly did all of the data pulling, data cleaning, outside research, and initial visualizations. Chloe worked on figuring out which features we should train our model on and initial evaluation of which features were most important. Ryan took the lead on the custom LR model and auditing for bias. We all worked on creating this blog post. Carly wrote the introduction, data explanation, values statement, and strike zone visualizations. Chloe worked on documenting our process, specifically how we subsetted the data and how we chose our features. Ryan worked on explaining our models and the results from our auditing. Overall, we all felt that we contributed equally to the project and we each took the lead on different parts of the project.</p>
+</section>
+<section id="personal-reflection" class="level3">
+<h3 class="anchored" data-anchor-id="personal-reflection">Personal Reflection</h3>
+<p>Throughout this process, I learned that it is oftentimes harder to find patterns that would intuitively seem to be relavent. Of course, I understand that MLB umpires are hired to be good at their jobs, but it would seem a reasonable assumption that there would be factors which cause them to deviate from perfect accuracy. While our model’s were able to pick up discrepancies in accuracy calling, I would have like both more time and computing power to be able to figure why our model’s were unable to converge; of course they may have never converged, but I would have liked to see how close we could have gotten. I learned throughout this process that developing a model to detect small variations can be especially challenging in large datasets, where some features have a much stronger predictive value that other features, and tend to outweight the smaller more nuanced patterns whcih can arise in data.</p>
+<p>I would say I exceeded my initial goals, as I had not thought I would be implementing an Advanced Optimizer to help with our project but more so tweaking the parameters and features weights of one of our existing models. I was really happy that I got the Newton Optimizer working, especially on such a large dataset although I would have liked to test it out on smalller data in which it would have been capable of converging, unlike our data. Whether that be because there was no real trend, or the dataset was too complex is hard to tell. I also really enjoyed exploring where the bias in our model was coming from and finding different ways to understand, so as far as the auditing would go I would say I met expectations, although I would have liked to look at a couple more features such as player nationality for example.</p>
+<p>I would say that one of the biggest things I’ve learend through this project, but especially this course is the ease of using GitHub. Unironically, before this class I really had no understanding of GitHub or how great it could be working on collaborative projects but I will carry on the skills I’ve learend with regard to GitHub to any of my future classes or jobs where it could be applicable. A big part of the experience was trial and error. We tried a lot of veritions of both the data and the training loops, espeically for the Newton Optimizer, and very few of them made any difference; a big thing I’ll take away is keep going and try anything you think could be helpful because there’s no harm in trying. This is especially relavent to me this summer, as I will be a developing a new gene manipulation procedure in chytrids, which will surely be trial with a whole lot of error.</p>
+
 
 
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-predictfinaloutcome" class="csl-entry" role="listitem">
+Barbee, Jasmine. 2020. <span>“Prediction of Final Pitch Outcome in MLB Games Using Statistical Learning Methods.”</span> California State University, Long Beach; thesis; ProQuest One Academic.
+</div>
+<div id="ref-umpirebias" class="csl-entry" role="listitem">
+Green, Etan, and David P. Daniels. 2014. <span>“What Does It Take to Call a Strike? Three Biases in Umpire Decision Making.”</span> <em>MIT Sloan Sports Analytics Conference</em>.
+</div>
+<div id="ref-predictpitchtypes" class="csl-entry" role="listitem">
+Sidle, Glenn, and Hien Tran. 2017. <span>“Using Multi-Class Classification Methods to Predict Baseball Pitch Types.”</span> <em>Sage Journals Journal of Sports Analytics</em>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
